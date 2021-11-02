@@ -7,7 +7,7 @@ from numpy import testing
 from numpy.core.fromnumeric import shape
 
 padding = 6
-window_size = (5,5)
+window_size = (10,10)
 def add_Glider(i,j, array):
     # extracted from GeeksforGeeks
     glider = np.array([[0, 0, 1],
@@ -56,7 +56,7 @@ def check_rule(array,i, j):
     neighbour_value = sum(list(actual_neighbours))
 
     if is_alive(array[i,j]):
-        print(array[i,j], neighbours)
+        #print(array[i,j], (i,j), neighbours)
         if neighbour_value == 2 or neighbour_value == 3:
             return 1
         else:
@@ -70,16 +70,33 @@ def check_rule(array,i, j):
 
 def update_array(array):
     row, column = shape(array)[0], shape(array)[1]
+    oldState = array
+    newState = pad_array(starting_array(window_size), 69) # creating a copy of the old state array
     for i in range(row-1):
         for j in range(column-1):
             if not is_padding(array[i,j], padding=69):
-                array[i,j] = check_rule(array, i, j)
+                newState[i,j] = check_rule(oldState, i, j)
 
-    return array
+    return newState
 
-array = starting_array((7,7))
+array = starting_array((window_size))
 padded_array = pad_array(array, 69)
-add_Blinker(2,2, padded_array)
-print(padded_array)
-#print(update_array(padded_array))
+#add_Blinker(2,2, padded_array)
+add_Glider(2,2,padded_array)
+"""print(padded_array)
+k = update_array(padded_array)
+print(k)
+for i in range(20):
+    k = update_array(k)
+    print(k)"""
+
+
+fig, ax = plt.subplots()
+img = ax.imshow(padded_array, interpolation='nearest')
+ani = animation.FuncAnimation(fig, update_array, fargs=None,
+                                frames = 10,
+                                interval=50,
+                                save_count=50)
+
+
 #print(get_neighbours(padded_array,3,3))

@@ -9,19 +9,18 @@ Two issues that should be corrected:
  black edge.
 """
 
-
 from os import name
 from numpy.core.defchararray import array
 import pygame
 import numpy as np
 
-from create_grids import starting_array, add_Glider, add_Blinker, add_beacon
+from create_grids import starting_array, add_Glider, add_Blinker, add_beacon, random_array
 
 BLUE = (34, 36, 128)
 WHITE = (200,200,200)
 BLACK = (0,0,0)
-WINDOW_HEIGHT = 400
-WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 600
 col = WHITE
 padding = 6
 
@@ -93,21 +92,24 @@ def start_game(grid):
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
     SCREEN.fill(BLACK)
+    import time
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
 
+        time.sleep(0.5)
         grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width
         pygame.display.update()
 
 
 def main():
-    array_start = starting_array((20,20))
+    #array_start = starting_array((20,20))
+    array_start = random_array(40,40)
     #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
-    add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
+    #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
 
     start_game(array_start)
 

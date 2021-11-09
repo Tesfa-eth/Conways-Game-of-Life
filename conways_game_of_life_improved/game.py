@@ -16,11 +16,13 @@ import numpy as np
 
 from create_grids import starting_array, add_Glider, add_Blinker, add_beacon, random_array
 
+from button import Button 
+
 BLUE = (34, 36, 128)
 WHITE = (200,200,200)
 BLACK = (0,0,0)
-WINDOW_HEIGHT = 600
-WINDOW_WIDTH = 600
+WINDOW_HEIGHT = 700
+WINDOW_WIDTH = 700
 col = WHITE
 padding = 6
 
@@ -92,12 +94,37 @@ def start_game(grid):
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
     SCREEN.fill(BLACK)
+    
+    
+    
+    #Termination Button 
+    stop_button = Button('blue', 105, 665, 50, 30, 'stop') #create quit button
+    stop_button.draw_rect(SCREEN) 
+    
+    #Pause Button 
+    pause_button = Button('green', 200, 665, 65, 30, 'pause')
+    pause_button.draw_rect(SCREEN)
+    
+    mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
+    
     import time
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #if button is clicked then the game stops
+                if stop_button.mouse_over(mouse_position):
+                    pygame.quit()
                 return
+                
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #if button is clicked then the game stops
+                if pause_button.mouse_over(mouse_position):
+                    pause = True
+                    pause_game()
+                #return 
 
         time.sleep(0.5)
         grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width

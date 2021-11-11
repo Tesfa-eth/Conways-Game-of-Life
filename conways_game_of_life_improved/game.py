@@ -10,6 +10,7 @@ Two issues that should be corrected:
 """
 
 from os import name
+from time import sleep
 from numpy.core.defchararray import array
 import pygame
 import numpy as np
@@ -21,8 +22,8 @@ from button import Button
 BLUE = (34, 36, 128)
 WHITE = (200,200,200)
 BLACK = (0,0,0)
-WINDOW_HEIGHT = 700
-WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 600
 col = WHITE
 padding = 6
 
@@ -98,42 +99,68 @@ def start_game(grid):
     
     
     #Termination Button 
-    stop_button = Button('blue', 105, 665, 50, 30, 'stop') #create quit button
-    stop_button.draw_rect(SCREEN) 
+    pause_button = Button('blue', 305, 500, 85, 50, 'Pause') #create quit button
+    #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    pause_button = Button('green', 200, 665, 65, 30, 'pause')
-    pause_button.draw_rect(SCREEN)
+    resume_button = Button('green', 400, 500, 110, 50, 'Resume')
     
-    mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
+    #Restart Button
+    # color, x, y, width, height
+    restart_button = Button('red', 180, 500, 110, 50, 'Restart')
+
+    #Quit
+    quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
     
     import time
+    pause = False
+    start = True
     while True:
+        # working on starting page
+        """if start:
+            SCREEN.fill((200,200,200))
+            random_button = Button('green', WINDOW_WIDTH/2 - 180, WINDOW_HEIGHT/2, 110, 50, 'Random')
+            custom_button = Button('brown', WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 110, 50, 'Custom')
+            random_button.draw_rect(SCREEN)
+            custom_button.draw_rect(SCREEN)"""
+            
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                #if button is clicked then the game stops
-                if stop_button.mouse_over(mouse_position):
+                if event.type == pygame.QUIT:
                     pygame.quit()
-                return
                 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                #if button is clicked then the game stops
-                if pause_button.mouse_over(mouse_position):
-                    pause = True
-                    pause_game()
-                #return 
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    #print(stop_button.mouse_over(mouse_position)) # returns false all the time
+                    print(mouse_position)
+                    #if button is clicked then the game stops
+                    if resume_button.mouse_over(mouse_position):
+                        pause = False
 
-        time.sleep(0.5)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    #if button is clicked then the game stops
+                    if pause_button.mouse_over(mouse_position):
+                        pause = True
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_button.mouse_over(mouse_position):
+                        main()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if quit_button.mouse_over(mouse_position):
+                        pygame.quit()
+        mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
+        #time.sleep(0.5)
         grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width
-        pygame.display.update()
+        resume_button.draw_rect(SCREEN)
+        pause_button.draw_rect(SCREEN)
+        restart_button.draw_rect(SCREEN)
+        quit_button.draw_rect(SCREEN)
+        if pause == False:
+            pygame.display.update()
 
 
-def main():
+def main(begin=random_array(40,40)):
     #array_start = starting_array((20,20))
-    array_start = random_array(40,40)
+    array_start = begin
     #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)

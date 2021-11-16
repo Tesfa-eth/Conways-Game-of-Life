@@ -73,12 +73,13 @@ def check_rule(array,i, j):
         else:
             return 0
 
-def update_grid(array, block_size):
+def update_grid(array, block_size, start_update):
     """updates the grid and returns the new state"""
     newState = np.zeros((array.shape[0], array.shape[1]))
     row, column = array.shape[0], array.shape[1]
-
+    print(start_update)
     for i, j in np.ndindex(row-1, column-1):
+        #if start_update:
         newState[i,j] = check_rule(array, i, j)
         col = BLUE if newState[i, j] == 1 else WHITE
         rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
@@ -111,10 +112,16 @@ def start_game(grid):
 
     #Quit
     quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
+
+    #Random start
+    random_button = Button('brown', WINDOW_HEIGHT//2, WINDOW_WIDTH/2, 190, 90, 'Random Start')
+    #Glider
+    glider_button = Button('brown',WINDOW_WIDTH/2-250, WINDOW_HEIGHT//2, 190, 90, 'Try Glider')
     
     import time
     pause = False
-    start = True
+    start = False
+    update = False
     while True:
         # working on starting page
         """if start:
@@ -129,36 +136,50 @@ def start_game(grid):
                     pygame.quit()
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    #print(stop_button.mouse_over(mouse_position)) # returns false all the time
-                    print(mouse_position)
-                    #if button is clicked then the game stops
                     if resume_button.mouse_over(mouse_position):
                         pause = False
-
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    #if button is clicked then the game stops
                     if pause_button.mouse_over(mouse_position):
                         pause = True
-                
-                if event.type == pygame.MOUSEBUTTONDOWN:
                     if restart_button.mouse_over(mouse_position):
                         main()
-                
+                    if random_button.mouse_over(mouse_position):
+                        start = True
+                    if glider_button.mouse_over(mouse_position):
+                        array_start = starting_array((40,40))
+                        add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
+                        grid = array_start
+                        start = True
+                    
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if quit_button.mouse_over(mouse_position):
                         pygame.quit()
+
+        # get mouse position              
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
-        #time.sleep(0.5)
-        grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width
-        resume_button.draw_rect(SCREEN)
-        pause_button.draw_rect(SCREEN)
-        restart_button.draw_rect(SCREEN)
-        quit_button.draw_rect(SCREEN)
+        
+        # once starts
+        if start:
+            SCREEN.fill(BLUE)
+            grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0], update) # has to be both height and width
+            # draw buttons
+            resume_button.draw_rect(SCREEN)
+            pause_button.draw_rect(SCREEN)
+            restart_button.draw_rect(SCREEN)
+            quit_button.draw_rect(SCREEN)
+        
+        # before the game starts
+        else:
+            # menu here
+            SCREEN.fill(BLUE)
+            random_button.draw_rect(SCREEN)
+            glider_button.draw_rect(SCREEN)
+
+        # update the grid unless it is paused
         if pause == False:
             pygame.display.update()
 
 
-def main(begin=random_array(40,40)):
+def main(begin=random_array(100,100)):
     #array_start = starting_array((20,20))
     array_start = begin
     #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)

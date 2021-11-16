@@ -81,8 +81,9 @@ def update_grid(array, block_size):
     for i, j in np.ndindex(row-1, column-1):
         newState[i,j] = check_rule(array, i, j)
         col = BLUE if newState[i, j] == 1 else WHITE
-        rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
+        rect = pygame.Rect((j*block_size)/2+150, (i*block_size)/2+120, block_size-1, block_size-1)
         pygame.draw.rect(SCREEN, col, rect)
+        #pygame.draw.rect(SCREEN.WINDOW_WIDTH // 2, SCREEN.rect.WINDOW_HEIGHT // 2)
 
     return newState
 
@@ -113,8 +114,10 @@ def start_game(grid):
     quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
     
     import time
+    
     pause = False
     start = True
+    
     while True:
         # working on starting page
         """if start:
@@ -123,7 +126,6 @@ def start_game(grid):
             custom_button = Button('brown', WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 110, 50, 'Custom')
             random_button.draw_rect(SCREEN)
             custom_button.draw_rect(SCREEN)"""
-            
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -149,7 +151,7 @@ def start_game(grid):
                         pygame.quit()
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
         #time.sleep(0.5)
-        grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width
+        grid = update_grid(grid, WINDOW_HEIGHT/grid.shape[0]) # block size; has to be both height and width
         resume_button.draw_rect(SCREEN)
         pause_button.draw_rect(SCREEN)
         restart_button.draw_rect(SCREEN)
@@ -158,7 +160,7 @@ def start_game(grid):
             pygame.display.update()
 
 
-def main(begin=random_array(40,40)):
+def main(begin=random_array(100,100)):
     #array_start = starting_array((20,20))
     array_start = begin
     #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)

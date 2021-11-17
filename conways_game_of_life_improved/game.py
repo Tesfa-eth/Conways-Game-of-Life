@@ -75,17 +75,26 @@ def check_rule(array,i, j):
 
 def update_grid(array, block_size, start_update):
     """updates the grid and returns the new state"""
-    newState = np.zeros((array.shape[0], array.shape[1]))
     # for now
-    newState = array
+    #newState = array
+    newState = np.zeros((array.shape[0], array.shape[1]))
+
     row, column = array.shape[0], array.shape[1]
     for i, j in np.ndindex(row-1, column-1):
         #if start_update:
         if start_update:
+            #print("UPDATING")
             newState[i,j] = check_rule(array, i, j)
-        col = BLUE if newState[i, j] == 1 else WHITE
-        rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
-        pygame.draw.rect(SCREEN, col, rect)
+            col = BLUE if newState[i, j] == 1 else WHITE
+            rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
+            pygame.draw.rect(SCREEN, col, rect)
+        else:
+            #print("No UPDATE")
+            newState = array
+            #print(newState)
+            col = BLUE if newState[i, j] == 1 else WHITE
+            rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
+            pygame.draw.rect(SCREEN, col, rect)
 
     return newState
 
@@ -98,7 +107,7 @@ def customize(mouse_position, grid):
     return grid
     #print(i,j)
     #print(mouse_position[0]//block_size, mouse_position[1]//block_size)
-    
+
 
 def start_game(grid):
     """starts the game"""
@@ -164,7 +173,7 @@ def start_game(grid):
                     if random_button.mouse_over(mouse_position):
                         start = True
                     if customize_button.mouse_over(mouse_position):
-                        array_start = starting_array((40,40))
+                        array_start = starting_array((16,16))
                         custom = True
                         #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
                         grid = array_start
@@ -176,11 +185,6 @@ def start_game(grid):
 
         # get mouse position              
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
-        
-        """if custom:
-            grid = customize(mouse_position, grid)"""
-            #print(mouse_position)
-        # once starts
     
         if start:
             SCREEN.fill(BLUE)
@@ -194,20 +198,20 @@ def start_game(grid):
         
         # before the game starts
         else:
-            # menu here
+            # menu
             SCREEN.fill(BLUE)
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
 
-        print(grid)
+        #print(grid)
         # update the grid unless it is paused
         if pause == False:
             pygame.display.update()
 
 
 def main(begin=random_array(20, 20)):
-    #array_start = starting_array((5,5))
-    array_start = begin
+    array_start = starting_array((8,8))
+    #array_start = begin
     add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)

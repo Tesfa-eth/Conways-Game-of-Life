@@ -19,8 +19,8 @@ from create_grids import starting_array, add_Glider, add_Blinker, add_beacon, ra
 
 from button import Button 
 
-BLUE = (34, 36, 128)
-WHITE = (200,200,200)
+#BLUE = (34, 36, 128)
+WHITE = (255,255,255)
 BLACK = (0,0,0)
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
@@ -80,7 +80,7 @@ def update_grid(array, block_size):
 
     for i, j in np.ndindex(row-1, column-1):
         newState[i,j] = check_rule(array, i, j)
-        col = BLUE if newState[i, j] == 1 else WHITE
+        col = BLACK if newState[i, j] == 1 else WHITE
         rect = pygame.Rect((j*block_size)/2+150, (i*block_size)/2+120, block_size-1, block_size-1)
         pygame.draw.rect(SCREEN, col, rect)
         #pygame.draw.rect(SCREEN.WINDOW_WIDTH // 2, SCREEN.rect.WINDOW_HEIGHT // 2)
@@ -95,23 +95,23 @@ def start_game(grid):
     pygame.display.set_caption("Conways game of life")
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
-    SCREEN.fill(BLACK)
+    SCREEN.fill(WHITE)
     
     
     
     #Termination Button 
-    pause_button = Button('blue', 305, 500, 85, 50, 'Pause') #create quit button
+    pause_button = Button(BLACK, 305, 500, 85, 50, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    resume_button = Button('green', 400, 500, 110, 50, 'Resume')
+    resume_button = Button(BLACK, 400, 500, 110, 50, 'Resume')
     
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('red', 180, 500, 110, 50, 'Restart')
+    restart_button = Button(BLACK, 180, 500, 110, 50, 'Restart')
 
     #Quit
-    quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
+    quit_button = Button(BLACK, 60, 500, 110, 50, 'Quit')
     
     import time
     

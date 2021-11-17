@@ -15,8 +15,8 @@ class Button():
     def draw_rect(self, surface):
         
         white_color = (255, 255, 255)
-        color_button = (170, 170, 170)
-        pygame.draw.rect(surface, self.color, (self.x, self.y, self.width, self.height), 0)
+        #color_button = (170, 170, 170)
+        pygame.draw.rect(surface, self.color, (self.x, self.y, self.width, self.height), 0, 15)
         
         if self.text != ' ':
             letter_font = pygame.font.SysFont('Corbel', 33) #fonts for the button

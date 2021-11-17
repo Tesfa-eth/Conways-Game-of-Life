@@ -81,7 +81,8 @@ def update_grid(array, block_size, start_update):
     row, column = array.shape[0], array.shape[1]
     for i, j in np.ndindex(row-1, column-1):
         #if start_update:
-        #newState[i,j] = check_rule(array, i, j)
+        if start_update:
+            newState[i,j] = check_rule(array, i, j)
         col = BLUE if newState[i, j] == 1 else WHITE
         rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
         pygame.draw.rect(SCREEN, col, rect)
@@ -93,7 +94,7 @@ def customize(mouse_position, grid):
     i = mouse_position[0]//block_size
     j = mouse_position[1]//block_size
     grid[j][i] = 1
-    print(grid)
+    #print(grid)
     return grid
     #print(i,j)
     #print(mouse_position[0]//block_size, mouse_position[1]//block_size)
@@ -125,10 +126,15 @@ def start_game(grid):
     #Quit
     quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
 
+    #Start
+    start_button = Button('black', 60, 430, 110, 50, 'Start')
+
+
     #Random start
     random_button = Button('brown', WINDOW_HEIGHT//2, WINDOW_WIDTH/2, 190, 90, 'Random Start')
+    
     #Glider
-    glider_button = Button('brown',WINDOW_WIDTH/2-250, WINDOW_HEIGHT//2, 190, 90, 'Try Glider')
+    customize_button = Button('brown',WINDOW_WIDTH/2-250, WINDOW_HEIGHT//2, 190, 90, 'Customize')
     
     import time
     pause = False
@@ -139,16 +145,25 @@ def start_game(grid):
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                        
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    if custom: # clicked user input
+                        grid = customize(mouse_position, grid)
                     if resume_button.mouse_over(mouse_position):
                         pause = False
                     if pause_button.mouse_over(mouse_position):
                         pause = True
                     if restart_button.mouse_over(mouse_position):
                         main()
+
+                    if start_button.mouse_over(mouse_position):
+                        #start update
+                        update = True
+                        custom = False
+                        #main()
                     if random_button.mouse_over(mouse_position):
                         start = True
-                    if glider_button.mouse_over(mouse_position):
+                    if customize_button.mouse_over(mouse_position):
                         array_start = starting_array((40,40))
                         custom = True
                         #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
@@ -162,8 +177,8 @@ def start_game(grid):
         # get mouse position              
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
         
-        if custom:
-            grid = customize(mouse_position, grid)
+        """if custom:
+            grid = customize(mouse_position, grid)"""
             #print(mouse_position)
         # once starts
     
@@ -175,23 +190,25 @@ def start_game(grid):
             pause_button.draw_rect(SCREEN)
             restart_button.draw_rect(SCREEN)
             quit_button.draw_rect(SCREEN)
+            start_button.draw_rect(SCREEN)
         
         # before the game starts
         else:
             # menu here
             SCREEN.fill(BLUE)
             random_button.draw_rect(SCREEN)
-            glider_button.draw_rect(SCREEN)
+            customize_button.draw_rect(SCREEN)
 
+        print(grid)
         # update the grid unless it is paused
         if pause == False:
             pygame.display.update()
 
 
 def main(begin=random_array(20, 20)):
-    #array_start = starting_array((20,20))
+    #array_start = starting_array((5,5))
     array_start = begin
-    #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
+    add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
 

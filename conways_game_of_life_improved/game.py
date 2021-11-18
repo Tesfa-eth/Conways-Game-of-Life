@@ -15,7 +15,7 @@ from numpy.core.defchararray import array
 import pygame
 import numpy as np
 
-from create_grids import starting_array, add_Glider, add_Blinker, add_beacon, random_array
+from create_grids import pad_array, starting_array, add_Glider, add_Blinker, add_beacon, random_array
 
 from button import Button 
 
@@ -29,8 +29,14 @@ padding = 6
 
 def get_neighbours(array, i, j):
     """returns all the 8 neighbours of a cell"""
-    return (array[i-1, j-1], array[i-1, j], array[i-1,j+1], array[i, j-1], array[i, j+1], 
-        array[i+1, j-1], array[i+1, j], array[i+1, j+1])
+    # to-do:
+    # take care of the frames rather than padding section
+    row, column = array.shape[0], array.shape[1]
+    if i >= row-2 or j >= column-2:
+        return (0,0,0,0,0,0,0,0)
+    else:
+        return (array[i-1, j-1], array[i-1, j], array[i-1,j+1], array[i, j-1], array[i, j+1], 
+            array[i+1, j-1], array[i+1, j], array[i+1, j+1])
 
 def is_padding(cell, padding):
     """
@@ -80,7 +86,7 @@ def update_grid(array, block_size, start_update):
     newState = np.zeros((array.shape[0], array.shape[1]))
 
     row, column = array.shape[0], array.shape[1]
-    for i, j in np.ndindex(row-1, column-1):
+    for i, j in np.ndindex(row, column):
         #if start_update:
         if start_update:
             #print("UPDATING")
@@ -99,17 +105,20 @@ def update_grid(array, block_size, start_update):
     return newState
 
 def customize(mouse_position, grid):
-    block_size = WINDOW_HEIGHT//grid.shape[0]
-    i = mouse_position[0]//block_size
-    j = mouse_position[1]//block_size
-    grid[j][i] = 1
+    block_size_height = WINDOW_HEIGHT//grid.shape[0]
+    i = mouse_position[0]//block_size_height
+    j = mouse_position[1]//block_size_height
+    if grid[j][i] == 1:
+        grid[j][i] = 0
+    else:
+        grid[j][i] = 1
     #print(grid)
     return grid
     #print(i,j)
     #print(mouse_position[0]//block_size, mouse_position[1]//block_size)
 
 
-def start_game(grid):
+def start_game():
     """starts the game"""
     global SCREEN, CLOCK
 
@@ -150,14 +159,18 @@ def start_game(grid):
     start = False
     update = False
     custom = False
+    maximize = 0
     while True:
+        if custom: # clicked user input
+            grid = customize(mouse_position, grid)
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                         
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if custom: # clicked user input
-                        grid = customize(mouse_position, grid)
+                    # give option of drag or click for customization
+                    """if custom: # clicked user input
+                        grid = customize(mouse_position, grid)"""
                     if resume_button.mouse_over(mouse_position):
                         pause = False
                     if pause_button.mouse_over(mouse_position):
@@ -171,12 +184,16 @@ def start_game(grid):
                         custom = False
                         #main()
                     if random_button.mouse_over(mouse_position):
+                        start_x = 45
+                        start_y = 45 # to be safely removed later
+                        grid = random_array(start_x, start_y)
                         start = True
                     if customize_button.mouse_over(mouse_position):
-                        array_start = starting_array((16,16))
+                        # once done remove all the occurance of start_x and start_y except this one
+                        start_x = 45
+                        start_y = 45
+                        grid = starting_array((start_x,start_y))
                         custom = True
-                        #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
-                        grid = array_start
                         start = True
                     
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -188,13 +205,18 @@ def start_game(grid):
     
         if start:
             SCREEN.fill(BLUE)
-            grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0], update) # has to be both height and width
+            if maximize % 15 == 0 and update == True:
+                grid = pad_array(grid, 0)
+                print("maximizing now")
+            grid = update_grid(grid, WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width
             # draw buttons
             resume_button.draw_rect(SCREEN)
             pause_button.draw_rect(SCREEN)
             restart_button.draw_rect(SCREEN)
             quit_button.draw_rect(SCREEN)
             start_button.draw_rect(SCREEN)
+
+            maximize += 1
         
         # before the game starts
         else:
@@ -210,13 +232,13 @@ def start_game(grid):
 
 
 def main(begin=random_array(20, 20)):
-    array_start = starting_array((8,8))
+    #array_start = starting_array((8,8))
     #array_start = begin
-    add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
+    #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
     #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
 
-    start_game(array_start)
+    start_game()
 
 
 if __name__ == "__main__":

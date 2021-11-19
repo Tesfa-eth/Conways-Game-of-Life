@@ -25,8 +25,18 @@ BLACK = (0,0,0)
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
 col = WHITE
-padding = 6
+#padding = 6
 
+
+# finding window dimension
+
+"""
+import pyautogui
+
+width, height= pyautogui.size()
+print(width)
+print(height)
+"""
 def get_neighbours(array, i, j):
     """returns all the 8 neighbours of a cell"""
     # to-do:
@@ -38,20 +48,20 @@ def get_neighbours(array, i, j):
         return (array[i-1, j-1], array[i-1, j], array[i-1,j+1], array[i, j-1], array[i, j+1], 
             array[i+1, j-1], array[i+1, j], array[i+1, j+1])
 
-def is_padding(cell, padding):
-    """
+"""def is_padding(cell, padding):
+    
     checks if a cell is a padding. Meaning, checks if the 'cell' is an actuall cell 
     or a wall.
     return: bool
-    """
-    return cell == padding
+    
+    return cell == padding"""
 
 
-def remove_edges(neighbours, padding=padding):
+def remove_edges(neighbours):
     """takes in a tuple and removes the egdes from them"""
     neighbours_list = list(neighbours)
-    egdeless_neighbours = [ 0 if is_padding(x, padding) else int(x) for x in neighbours_list]
-    return tuple(egdeless_neighbours)
+    #egdeless_neighbours = [ 0 if is_padding(x, padding) else int(x) for x in neighbours_list]
+    return tuple(neighbours_list)
 
 def is_alive(cell):
     """returs True if a cell is alive and false, otherwise."""
@@ -64,8 +74,8 @@ def check_rule(array,i, j):
     return: 0 (if it will die) or 1 (if it will live)
     """
     neighbours = get_neighbours(array, i, j)
-    actual_neighbours = remove_edges(neighbours)
-    neighbour_value = sum(list(actual_neighbours))
+    #actual_neighbours = remove_edges(neighbours)
+    neighbour_value = sum(list(neighbours))
 
     if is_alive(array[i,j]):
         if neighbour_value == 2 or neighbour_value == 3:
@@ -79,10 +89,11 @@ def check_rule(array,i, j):
         else:
             return 0
 
-def update_grid(array, block_size, start_update):
+def update_grid(array, block_size_y,block_size_x, start_update):
     """updates the grid and returns the new state"""
     # for now
     #newState = array
+    btn_space = WINDOW_HEIGHT//20
     newState = np.zeros((array.shape[0], array.shape[1]))
 
     row, column = array.shape[0], array.shape[1]
@@ -92,14 +103,14 @@ def update_grid(array, block_size, start_update):
             #print("UPDATING")
             newState[i,j] = check_rule(array, i, j)
             col = BLUE if newState[i, j] == 1 else WHITE
-            rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
+            rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
         else:
             #print("No UPDATE")
             newState = array
             #print(newState)
             col = BLUE if newState[i, j] == 1 else WHITE
-            rect = pygame.Rect(j*block_size, i*block_size, block_size-1, block_size-1)
+            rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
 
     return newState
@@ -122,6 +133,12 @@ def start_game():
     """starts the game"""
     global SCREEN, CLOCK
 
+    no_of_btns = 5
+    btn_height = WINDOW_HEIGHT//20 # leave a space to draw buttons
+    btn_location_h = WINDOW_HEIGHT - btn_height # btn location from buttom screen
+    btn_width = WINDOW_WIDTH//no_of_btns # button width for each button
+    btn_location_w = WINDOW_WIDTH - btn_width # btn location from buttom screen
+
     pygame.init()
     pygame.display.set_caption("Conways game of life")
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -131,22 +148,21 @@ def start_game():
     
     
     #Termination Button 
-    pause_button = Button('blue', 305, 500, 85, 50, 'Pause') #create quit button
+    pause_button = Button('blue', btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    resume_button = Button('green', 400, 500, 110, 50, 'Resume')
+    resume_button = Button('green', btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
     
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('red', 180, 500, 110, 50, 'Restart')
+    restart_button = Button('red', btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
 
     #Quit
-    quit_button = Button('brown', 60, 500, 110, 50, 'Quit')
+    quit_button = Button('brown', btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
 
-    #Start
-    start_button = Button('black', 60, 430, 110, 50, 'Start')
-
+    #Start    btn_location_w-(btn_width*4) gives us the exact location of the buttons
+    start_button = Button('black', btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
 
     #Random start
     random_button = Button('brown', WINDOW_HEIGHT//2, WINDOW_WIDTH/2, 190, 90, 'Random Start')
@@ -205,10 +221,11 @@ def start_game():
     
         if start:
             SCREEN.fill(BLUE)
-            if maximize % 15 == 0 and update == True:
+            # maximize the grid in every 15 iteration
+            if maximize % 35 == 0 and update == True:
                 grid = pad_array(grid, 0)
                 print("maximizing now")
-            grid = update_grid(grid, WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width
+            grid = update_grid(grid, WINDOW_WIDTH/grid.shape[1], WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width
             # draw buttons
             resume_button.draw_rect(SCREEN)
             pause_button.draw_rect(SCREEN)

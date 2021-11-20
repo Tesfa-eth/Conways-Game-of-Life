@@ -12,7 +12,7 @@ window_size = (10,10)
 
 def starting_array(shape=window_size):
     """gives us a window (array) of specific shape"""
-    return np.zeros((shape))
+    return np.zeros((shape), np.int8)
 
 def pad_array(array, _with=padding):
     """pads the array/window with specific constant _with"""
@@ -42,3 +42,10 @@ def add_beacon(i,j, array):
 def random_array(x, y):
     """generates a random array of x, y dimensions"""
     return np.random.randint(0,2, (x, y))
+
+
+def add_random(n, array, x,y):
+    """n = size of random array, array is the black array, x, y: starting coordinate for random"""
+    r = np.random.randint(0,2, (n, n))
+    array[x:x+n, y:y+n] = r
+    

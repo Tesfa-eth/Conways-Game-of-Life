@@ -110,19 +110,26 @@ def update_grid(array, block_size_y,block_size_x, start_update):
             newState = array
             #print(newState)
             col = BLUE if newState[i, j] == 1 else WHITE
-            rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
+            rect = pygame.Rect(j*block_size_y, i*block_size_x, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
 
     return newState
 
 def customize(mouse_position, grid):
     block_size_height = WINDOW_HEIGHT//grid.shape[0]
+    block_size_weight = WINDOW_WIDTH//grid.shape[1]
     i = mouse_position[0]//block_size_height
-    j = mouse_position[1]//block_size_height
-    if grid[j][i] == 1:
+    j = mouse_position[1]//block_size_weight
+
+    print(i,j)
+    print('shape', grid.shape)
+    
+    if i < grid.shape[0] and j < grid.shape[0]:
+        grid[j][i] = 1
+    """if grid[j][i] == 1: # depending on what they want regarding mouse customization
         grid[j][i] = 0
     else:
-        grid[j][i] = 1
+        grid[j][i] = 1"""
     #print(grid)
     return grid
     #print(i,j)
@@ -165,10 +172,10 @@ def start_game():
     start_button = Button('black', btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
 
     #Random start
-    random_button = Button('brown', WINDOW_HEIGHT//2, WINDOW_WIDTH/2, 190, 90, 'Random Start')
+    random_button = Button('brown', WINDOW_WIDTH//2, WINDOW_HEIGHT//2, WINDOW_WIDTH//3, 90, 'Random Start')
     
     #Glider
-    customize_button = Button('brown',WINDOW_WIDTH/2-250, WINDOW_HEIGHT//2, 190, 90, 'Customize')
+    customize_button = Button('brown',WINDOW_WIDTH//8, WINDOW_HEIGHT//2, WINDOW_WIDTH//4, 90, 'Customize')
     
     import time
     pause = False
@@ -222,7 +229,7 @@ def start_game():
         if start:
             SCREEN.fill(BLUE)
             # maximize the grid in every 15 iteration
-            if maximize % 35 == 0 and update == True:
+            if maximize % 25 == 0 and update == True:
                 grid = pad_array(grid, 0)
                 print("maximizing now")
             grid = update_grid(grid, WINDOW_WIDTH/grid.shape[1], WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width

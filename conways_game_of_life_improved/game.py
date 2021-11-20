@@ -182,7 +182,26 @@ def start_game():
     start = False
     update = False
     custom = False
+    zoom_out = False
+    zoom_in = False
     maximize = 0
+    ######take user input################
+    # basic font for user typed
+    base_font = pygame.font.Font(None, 32)
+    user_text = ''
+    
+    # create rectangle
+    input_rect = pygame.Rect(WINDOW_WIDTH//3, WINDOW_HEIGHT//3, 10, 32)
+    
+    # color_active stores color(lightskyblue3) which
+    # gets active when input box is clicked by user
+    color_active = pygame.Color('lightskyblue3')
+    color_passive = (78, 106, 150)
+    color = color_passive
+    active = False
+    #####################
+    start_x = 45 # default grid size
+    start_y = 45
     while True:
         if custom: # clicked user input
             grid = customize(mouse_position, grid)
@@ -194,6 +213,14 @@ def start_game():
                     # give option of drag or click for customization
                     """if custom: # clicked user input
                         grid = customize(mouse_position, grid)"""
+
+                    ########user input##################
+                    if input_rect.collidepoint(event.pos):
+                        active = True
+                    else:
+                        active = False
+                    ############################
+
                     if resume_button.mouse_over(mouse_position):
                         pause = False
                     if pause_button.mouse_over(mouse_position):
@@ -207,14 +234,24 @@ def start_game():
                         custom = False
                         #main()
                     if random_button.mouse_over(mouse_position):
-                        start_x = 45
-                        start_y = 45 # to be safely removed later
+                        try:
+                            start_x = start_y = int(user_text) # take the starting gride size
+                        except ValueError:
+                            start_x = start_y = 40
+                            
+                        #start_x = 45
+                        #start_y = 45 # to be safely removed later
                         grid = random_array(start_x, start_y)
                         start = True
                     if customize_button.mouse_over(mouse_position):
+                        try:
+                            start_x = start_y = int(user_text) # take the starting gride size
+                        except ValueError:
+                            start_x = start_y = 40
+                        
                         # once done remove all the occurance of start_x and start_y except this one
-                        start_x = 45
-                        start_y = 45
+                        #start_x = 45
+                        #start_y = 45
                         grid = starting_array((start_x,start_y))
                         custom = True
                         start = True
@@ -223,15 +260,41 @@ def start_game():
                     if quit_button.mouse_over(mouse_position):
                         pygame.quit()
 
+                ###################################################
+                
+                if event.type == pygame.KEYDOWN:
+                    pressed = pygame.key.get_pressed()
+                    if pressed[pygame.K_o]: # azoom out
+                        zoom_out = True
+                    if pressed[pygame.K_s]: # azoom out
+                        zoom_out = False
+                    if pressed[pygame.K_i]: # drag (open option!)
+                        zoom_in = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        # when back space is hit
+                        user_text = user_text[:-1]
+                    else: # additional string
+                        user_text += event.unicode
+
+                   
         # get mouse position              
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
     
         if start:
             SCREEN.fill(BLUE)
             # maximize the grid in every 15 iteration
-            if maximize % 25 == 0 and update == True:
+            if zoom_out and update:
+                #if maximize % 10 == 0:
                 grid = pad_array(grid, 0)
                 print("maximizing now")
+                maximize += 1
+                zoom_out = False
+            elif zoom_in and update:
+                x = grid.shape[0]
+                y = grid.shape[1]
+                grid = grid[1:x-1, 1:y-1]
+                zoom_in = False
             grid = update_grid(grid, WINDOW_WIDTH/grid.shape[1], WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width
             # draw buttons
             resume_button.draw_rect(SCREEN)
@@ -239,8 +302,6 @@ def start_game():
             restart_button.draw_rect(SCREEN)
             quit_button.draw_rect(SCREEN)
             start_button.draw_rect(SCREEN)
-
-            maximize += 1
         
         # before the game starts
         else:
@@ -248,6 +309,18 @@ def start_game():
             SCREEN.fill(BLUE)
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
+
+            # text input
+            if active:
+                color = color_active
+            else:
+                color = color_passive
+            
+            pygame.draw.rect(SCREEN, color, input_rect)
+            text_surface = base_font.render(user_text, True, (255, 255, 255))
+            SCREEN.blit(text_surface, (input_rect.x+5, input_rect.y+5))
+            input_rect.w = max(100, text_surface.get_width()+10)
+            pygame.display.flip()
 
         #print(grid)
         # update the grid unless it is paused

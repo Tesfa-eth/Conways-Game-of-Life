@@ -13,11 +13,13 @@ from os import name
 from time import sleep
 from numpy.core.defchararray import array
 import pygame
+import pygame_menu
 import numpy as np
 
 from create_grids import pad_array, starting_array, add_Glider, add_Blinker, add_beacon, random_array
 
 from button import Button 
+
 
 BLUE = (34, 36, 128)
 WHITE = (200,200,200)
@@ -139,7 +141,6 @@ def customize(mouse_position, grid):
 def start_game():
     """starts the game"""
     global SCREEN, CLOCK
-
     no_of_btns = 5
     btn_height = WINDOW_HEIGHT//20 # leave a space to draw buttons
     btn_location_h = WINDOW_HEIGHT - btn_height # btn location from buttom screen
@@ -151,7 +152,6 @@ def start_game():
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     CLOCK = pygame.time.Clock()
     SCREEN.fill(BLACK)
-    
     
     
     #Termination Button 
@@ -171,11 +171,21 @@ def start_game():
     #Start    btn_location_w-(btn_width*4) gives us the exact location of the buttons
     start_button = Button('black', btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
 
+    #Menu
+    menu = pygame_menu.Menu('Game of Life', 600, 600, center_content = True, enabled = True, mouse_enabled = True, mouse_visible = True, theme = pygame_menu.themes.THEME_DARK)
+    
+    #Grid choice
+    choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
+    choice = menu.add.selector(title='Choose grid:', items=choices, style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
+    
     #Random start
-    random_button = Button('brown', WINDOW_WIDTH//2, WINDOW_HEIGHT//2, WINDOW_WIDTH//3, 90, 'Random Start')
+    random_button = Button('brown', WINDOW_WIDTH//2 +10, WINDOW_HEIGHT//2+90, WINDOW_WIDTH//3, 90, 'Random Start')
     
     #Glider
-    customize_button = Button('brown',WINDOW_WIDTH//8, WINDOW_HEIGHT//2, WINDOW_WIDTH//4, 90, 'Customize')
+    customize_button = Button('brown',WINDOW_WIDTH//8+20, WINDOW_HEIGHT//2+90, WINDOW_WIDTH//4, 90, 'Customize')
+    
+    
+    #grid_choice = pygame_menu.Menu('some text', 100, 100)
     
     import time
     pause = False
@@ -203,9 +213,11 @@ def start_game():
     start_x = 45 # default grid size
     start_y = 45
     while True:
+        
         if custom: # clicked user input
             grid = customize(mouse_position, grid)
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                         
@@ -276,8 +288,11 @@ def start_game():
                         user_text = user_text[:-1]
                     else: # additional string
                         user_text += event.unicode
+        '''if dropdown_menu.is_enabled():
+            dropdown_menu.update(events)
+            dropdown_menu.draw(SCREEN)'''
 
-                   
+            
         # get mouse position              
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
     
@@ -304,9 +319,11 @@ def start_game():
             start_button.draw_rect(SCREEN)
         
         # before the game starts
-        else:
+        if menu.is_enabled():
+            menu.update(events)
+            menu.draw(SCREEN)
             # menu
-            SCREEN.fill(BLUE)
+            #SCREEN.fill(BLUE)
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
 

@@ -203,18 +203,18 @@ def start_game(grid, dic):
     SCREEN.fill(BLACK)
 
     #Termination Button 
-    pause_button = Button('blue', 305, 700, 85, 50, 'Pause') #create quit button
+    pause_button = Button('blue', BLACK, 20, 305, 700, 85, 50, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    resume_button = Button('magenta', 400, 700, 110, 50, 'Resume')
+    resume_button = Button('magenta', BLACK,20, 400, 700, 110, 50, 'Resume')
     
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('darkblue', 180, 700, 110, 50, 'Restart')
+    restart_button = Button('darkblue',BLACK,20, 180, 700, 110, 50, 'Restart')
 
     #Quit
-    quit_button = Button('brown', 60, 700, 110, 50, 'Quit')
+    quit_button = Button('brown', BLACK, 20, 60, 700, 110, 50, 'Quit')
 
     
 
@@ -253,7 +253,7 @@ def start_game(grid, dic):
         #####################
         stuff = update_dic_state(dic_, grid_)
         alive = sum([1 for i in dic_ if dic_[i][0] == 1])
-        alive_button = Button('red', 550, 600, 200, 50, f'Alive:{alive}')
+        alive_button = Button('red',BLACK, 20, 550, 600, 200, 50, f'Alive:{alive}')
         dic_ = stuff[0]
         grid_ = stuff[1]
         ####################
@@ -262,7 +262,7 @@ def start_game(grid, dic):
 
         ###################
         gen += 1
-        gen_button = Button('maroon', 550, 700, 200, 50, f'Generation:{gen}')
+        gen_button = Button('maroon',BLACK, 20, 550, 700, 200, 50, f'Generation:{gen}')
         block_size_r = WINDOW_HEIGHT//n1
         block_size_c = WINDOW_WIDTH//n2
         list_ = [BLACK, BLUE, RED, GREEN]

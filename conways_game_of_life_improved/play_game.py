@@ -8,6 +8,7 @@ Adding shading for 'once alive' cells
 from os import name
 from numpy.core.defchararray import array
 import pygame
+import pygame_menu
 import numpy as np
 import random 
 
@@ -16,11 +17,11 @@ from create_grids import add_random, random_array, add_Glider,  starting_array, 
 from button import Button 
 
 BLUE = (34, 36, 128)
-WHITE = (200,200,200)
+WHITE = (255,255,255)
 GREEN = (0, 255, 0)
 BLACK = (0,0,0)
-WINDOW_HEIGHT = 800
-WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 600
 RED = (255, 0, 0)
 col = WHITE
 
@@ -193,6 +194,13 @@ def change_state(array, index):
 def start_game(grid, dic):
     """starts the game"""
     global SCREEN, CLOCK
+    
+    no_of_btns = 5
+    btn_height = WINDOW_HEIGHT//20 # leave a space to draw buttons
+    btn_location_h = WINDOW_HEIGHT - btn_height # btn location from buttom screen
+    btn_width = WINDOW_WIDTH//no_of_btns # button width for each button
+    btn_location_w = WINDOW_WIDTH - btn_width # btn location from buttom screen
+
 
     gen = 0
     
@@ -202,20 +210,64 @@ def start_game(grid, dic):
     CLOCK = pygame.time.Clock()
     SCREEN.fill(BLACK)
 
-    #Termination Button 
-    pause_button = Button('blue', BLACK, 20, 305, 700, 85, 50, 'Pause') #create quit button
-    #stop_button.draw_rect(SCREEN) 
-    
     #Pause Button 
-    resume_button = Button('magenta', BLACK,20, 400, 700, 110, 50, 'Resume')
+    pause_button = Button((255, 117, 117), WHITE, 0, 
+                          btn_location_w-(btn_width*3), btn_location_h, 
+                          btn_width, btn_height, 'Pause')
+    #pause_button = Button('blue', BLACK, 20, 305, 700, 85, 50, 'Pause') #create quit button
+     
     
+    #Resume Button 
+    #resume_button = Button('magenta', BLACK,20, 400, 700, 110, 50, 'Resume')
+    resume_button = Button((255, 173, 173),WHITE, 0, 
+                           btn_location_w-(btn_width*2), btn_location_h, 
+                           btn_width, btn_height, 'Resume')
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('darkblue',BLACK,20, 180, 700, 110, 50, 'Restart')
+    #restart_button = Button('darkblue',BLACK,20, 180, 700, 110, 50, 'Restart')
+    restart_button = Button((255, 117, 117),WHITE, 0, 
+                            btn_location_w-(btn_width*1), btn_location_h, 
+                            btn_width, btn_height, 'Restart')
 
     #Quit
-    quit_button = Button('brown', BLACK, 20, 60, 700, 110, 50, 'Quit')
+    #quit_button = Button('brown', BLACK, 20, 60, 700, 110, 50, 'Quit')
+    quit_button = Button((255, 87, 87),WHITE, 0, btn_location_w-(btn_width*0),
+                         btn_location_h, btn_width, btn_height, 'Quit')
+    #Start Button
+    start_button = Button((255, 87, 87), WHITE, 0, btn_location_w-(btn_width*4),
+                          btn_location_h, btn_width, btn_height, 'Start')
+    
+    ######################## MENU ########################
+    #Menu
+    menu_fonts = pygame_menu.font.FONT_NEVIS
+    menu_theme = pygame_menu.Theme(background_color = BLACK,
+                     title_background_color=BLACK, title_font_color= WHITE,
+                     title_offset=(160,130), title_font_size = 48,
+                     widget_padding= 5, widget_font=menu_fonts, 
+                     widget_font_size = 20, widget_background_color = BLACK,
+                     widget_border_color = BLACK, widget_border_width =0,
+                     title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE)
+    
+    menu = pygame_menu.Menu('Game of Life', 600, 600, center_content = True, 
+                            enabled = True, mouse_enabled = True, 
+                            mouse_visible = True, 
+                            theme = menu_theme)
+    
+    #Grid choice
+    choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
+    choice = menu.add.selector(title='Choose grid:', items=choices,
+                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
 
+    #Random start
+    random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
+                           WINDOW_HEIGHT//2+140, WINDOW_WIDTH//3+90, 35, 
+                           'Random Start')
+    
+    #Glider
+    customize_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//8+80, 
+                              WINDOW_HEIGHT//2+80, WINDOW_WIDTH//4+140, 35, 
+                              'Customize')
+    ###############################################
     
 
     import time
@@ -223,9 +275,12 @@ def start_game(grid, dic):
     grid_ = grid
     pause = False
     start = True
+    update = False
+    custom = False
     
     while True:
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -235,62 +290,91 @@ def start_game(grid, dic):
                 if resume_button.mouse_over(mouse_position):
                     pause = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                    #if button is clicked then the game stops
+                #if button is clicked then the game stops
                 if pause_button.mouse_over(mouse_position):
                     pause = True
                 
-            if event.type == pygame.MOUSEBUTTONDOWN:
                 if restart_button.mouse_over(mouse_position):
                     main()
+
+                if start_button.mouse_over(mouse_position):
+                    #start update
+                    update = True
+                    custom = False
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if quit_button.mouse_over(mouse_position):
-                    pygame.quit()            
+                    pygame.quit()       
+                    
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
         
+        if start:
+            SCREEN.fill(BLACK)
+            #####################
+            stuff = update_dic_state(dic_, grid_)
+            alive = sum([1 for i in dic_ if dic_[i][0] == 1])
+            alive_button = Button((245, 186, 184),BLACK, 20, 10, 10, 200, 50, 
+                                  f'Alive:{alive}')
+            dic_ = stuff[0]
+            grid_ = stuff[1]
+            ####################
         
-        #####################
-        stuff = update_dic_state(dic_, grid_)
-        alive = sum([1 for i in dic_ if dic_[i][0] == 1])
-        alive_button = Button('red',BLACK, 20, 550, 600, 200, 50, f'Alive:{alive}')
-        dic_ = stuff[0]
-        grid_ = stuff[1]
-        ####################
-        
-        #time.sleep(0.05)
+            #time.sleep(0.05)
 
-        ###################
-        gen += 1
-        gen_button = Button('maroon',BLACK, 20, 550, 700, 200, 50, f'Generation:{gen}')
-        block_size_r = WINDOW_HEIGHT//n1
-        block_size_c = WINDOW_WIDTH//n2
-        list_ = [BLACK, BLUE, RED, GREEN]
-        for i, j in np.ndindex(n1, n2):
-            #col = random.choice(list_)
+            ###################
+            gen += 1
+            gen_button = Button((196, 73, 69),BLACK, 20, 390, 10, 200, 50,
+                                f'Generation:{gen}')
+            block_size_r = WINDOW_HEIGHT//n1
+            block_size_c = WINDOW_WIDTH//n2
+            list_ = [BLACK, BLUE, RED, GREEN]
+            for i, j in np.ndindex(n1, n2):
+                #col = random.choice(list_)
 
-            no1 = random.randint(0,255)
-            no2 = random.randint(0,255)
-            no3 = random.randint(0,255)
-            col = (no1, no2, no3)
-            if grid_[i,j] == 1:
-                col = BLUE
-            if grid_[i,j] == 5:
-                col = (240,210,210)
-            if grid_[i,j] == 0:
-                col = (50, 50, 50)
-            #print(col)
-            #col = col if grid_[i, j] == 1 else (50,50,50)
-            rect = pygame.Rect(j*block_size_c, i*block_size_r, block_size_c-1, block_size_r-1)
-            pygame.draw.rect(SCREEN, col, rect)
+                no1 = random.randint(0,255)
+                no2 = random.randint(0,255)
+                no3 = random.randint(0,255)
+                col = (no1, no2, no3)
+                if grid_[i,j] == 1:
+                    col = BLUE
+                if grid_[i,j] == 5:
+                    col = (240,210,210)
+                if grid_[i,j] == 0:
+                    col = (50, 50, 50)
+                #print(col)
+                #col = col if grid_[i, j] == 1 else (50,50,50)
+                rect = pygame.Rect(j*block_size_c, i*block_size_r, block_size_c-1, block_size_r-1)
+                pygame.draw.rect(SCREEN, col, rect)
         
         
-        resume_button.draw_rect(SCREEN)
-        pause_button.draw_rect(SCREEN)
-        restart_button.draw_rect(SCREEN)
-        quit_button.draw_rect(SCREEN)
-        gen_button.draw_rect(SCREEN)
-        alive_button.draw_rect(SCREEN)
+            resume_button.draw_rect(SCREEN)
+            start_button.draw_rect(SCREEN)
+            pause_button.draw_rect(SCREEN)
+            restart_button.draw_rect(SCREEN)
+            quit_button.draw_rect(SCREEN)
+            gen_button.draw_rect(SCREEN)
+            alive_button.draw_rect(SCREEN)
+            
+        else:
+            #menu
+            menu.update(events) 
+            menu.draw(SCREEN)
+            
+            #subtitle
+            myfont2 = pygame.font.SysFont('Nevis', 28)
+            subtitle = myfont2.render('By Tesfa, Swagata, and Niki', False, WHITE)
+            SCREEN.blit(subtitle,(165,220))
+            
+            #message for user input
+            myfont3 = pygame.font.SysFont('Nevis', 25)
+            type_msg = myfont3.render('Type Number:', False, WHITE)
+            SCREEN.blit(type_msg,(WINDOW_WIDTH//3-20, WINDOW_HEIGHT//3+77))
+    
+            random_button.draw_rect(SCREEN)
+            customize_button.draw_rect(SCREEN)
+
+            pygame.display.flip()
+        
         if pause == False:
             pygame.display.update()
         pygame.display.update()

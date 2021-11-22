@@ -13,6 +13,7 @@ from os import name
 from time import sleep
 from numpy.core.defchararray import array
 import pygame
+import pygame_menu
 import numpy as np
 
 from create_grids import pad_array, starting_array, add_Glider, add_Blinker, add_beacon, random_array
@@ -20,7 +21,7 @@ from create_grids import pad_array, starting_array, add_Glider, add_Blinker, add
 from button import Button 
 
 BLUE = (34, 36, 128)
-WHITE = (200,200,200)
+WHITE = (255,255,255)
 BLACK = (0,0,0)
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
@@ -102,14 +103,14 @@ def update_grid(array, block_size_y,block_size_x, start_update):
         if start_update:
             #print("UPDATING")
             newState[i,j] = check_rule(array, i, j)
-            col = BLUE if newState[i, j] == 1 else WHITE
+            col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
         else:
             #print("No UPDATE")
             newState = array
             #print(newState)
-            col = BLUE if newState[i, j] == 1 else WHITE
+            col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
 
@@ -153,29 +154,52 @@ def start_game():
     SCREEN.fill(BLACK)
     
     
-    
     #Termination Button 
-    pause_button = Button('blue', WHITE, 0, btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
+    pause_button = Button((255, 117, 117), WHITE, 0, btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    resume_button = Button('green',WHITE, 0, btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
+    resume_button = Button((255, 173, 173),WHITE, 0, btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
     
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('red',WHITE, 0, btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
+    restart_button = Button((255, 117, 117),WHITE, 0, btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
 
     #Quit
-    quit_button = Button('brown',WHITE, 0, btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
+    quit_button = Button((255, 87, 87),WHITE, 0, btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
 
     #Start    btn_location_w-(btn_width*4) gives us the exact location of the buttons
-    start_button = Button('black', WHITE, 0, btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
+    start_button = Button((255, 87, 87), WHITE, 0, btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
+    
+    #Menu
+    menu_fonts = pygame_menu.font.FONT_NEVIS
+    menu_theme = pygame_menu.Theme(background_color = BLACK,
+                     title_background_color=BLACK, title_font_color= WHITE,
+                     title_offset=(160,130), title_font_size = 48,
+                     widget_padding= 5, widget_font=menu_fonts, 
+                     widget_font_size = 20, widget_background_color = BLACK,
+                     widget_border_color = BLACK, widget_border_width =0,
+                     title_bar_style = pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE)
+    
+    menu = pygame_menu.Menu('Game of Life', 600, 600, center_content = True, 
+                            enabled = True, mouse_enabled = True, 
+                            mouse_visible = True, 
+                            theme = menu_theme)
+    
+    #Grid choice
+    choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
+    choice = menu.add.selector(title='Choose grid:', items=choices,
+                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
 
     #Random start
-    random_button = Button('brown', WHITE, 20, WINDOW_WIDTH//2, WINDOW_HEIGHT//2, WINDOW_WIDTH//3, 90, 'Random Start')
+    random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
+                           WINDOW_HEIGHT//2+140, WINDOW_WIDTH//3+90, 35, 
+                           'Random Start')
     
     #Glider
-    customize_button = Button('brown', WHITE, 20,WINDOW_WIDTH//8, WINDOW_HEIGHT//2, WINDOW_WIDTH//4, 90, 'Customize')
+    customize_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//8+80, 
+                              WINDOW_HEIGHT//2+80, WINDOW_WIDTH//4+140, 35, 
+                              'Customize')
     
     import time
     pause = False
@@ -191,12 +215,12 @@ def start_game():
     user_text = ''
     
     # create rectangle
-    input_rect = pygame.Rect(WINDOW_WIDTH//3, WINDOW_HEIGHT//3, 10, 32)
+    input_rect = pygame.Rect(WINDOW_WIDTH//3+100, WINDOW_HEIGHT//3+70, 5, 32)
     
-    # color_active stores color(lightskyblue3) which
+    # color_active stores color(red) which
     # gets active when input box is clicked by user
-    color_active = pygame.Color('lightskyblue3')
-    color_passive = (78, 106, 150)
+    color_active = pygame.Color(194, 60, 60)
+    color_passive = (196, 196, 196)
     color = color_passive
     active = False
     #####################
@@ -205,7 +229,9 @@ def start_game():
     while True:
         if custom: # clicked user input
             grid = customize(mouse_position, grid)
-        for event in pygame.event.get():
+            
+        events = pygame.event.get()
+        for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                         
@@ -282,7 +308,7 @@ def start_game():
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
     
         if start:
-            SCREEN.fill(BLUE)
+            SCREEN.fill(BLACK)
             # maximize the grid in every 15 iteration
             if zoom_out and update:
                 #if maximize % 10 == 0:
@@ -304,9 +330,21 @@ def start_game():
             start_button.draw_rect(SCREEN)
         
         # before the game starts
-        else:
-            # menu
-            SCREEN.fill(BLUE)
+        else:    
+            #menu
+            menu.update(events) 
+            menu.draw(SCREEN)
+            
+            #subtitle
+            myfont2 = pygame.font.SysFont('Nevis', 28)
+            subtitle = myfont2.render('By Tesfa, Swagata, and Niki', False, WHITE)
+            SCREEN.blit(subtitle,(165,220))
+            
+            #message for user input
+            myfont3 = pygame.font.SysFont('Nevis', 25)
+            type_msg = myfont3.render('Type Number:', False, WHITE)
+            SCREEN.blit(type_msg,(WINDOW_WIDTH//3-20, WINDOW_HEIGHT//3+77))
+    
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
 
@@ -316,8 +354,8 @@ def start_game():
             else:
                 color = color_passive
             
-            pygame.draw.rect(SCREEN, color, input_rect)
-            text_surface = base_font.render(user_text, True, (255, 255, 255))
+            pygame.draw.rect(SCREEN, color, input_rect, border_radius=20)
+            text_surface = base_font.render(user_text, True, WHITE)
             SCREEN.blit(text_surface, (input_rect.x+5, input_rect.y+5))
             input_rect.w = max(100, text_surface.get_width()+10)
             pygame.display.flip()

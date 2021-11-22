@@ -155,27 +155,27 @@ def start_game():
     
     
     #Termination Button 
-    pause_button = Button('blue', btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
+    pause_button = Button('blue', WHITE, 0, btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
     #Pause Button 
-    resume_button = Button('green', btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
+    resume_button = Button('green',WHITE, 0, btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
     
     #Restart Button
     # color, x, y, width, height
-    restart_button = Button('red', btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
+    restart_button = Button('red',WHITE, 0, btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
 
     #Quit
-    quit_button = Button('brown', btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
+    quit_button = Button('brown',WHITE, 0, btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
 
     #Start    btn_location_w-(btn_width*4) gives us the exact location of the buttons
-    start_button = Button('black', btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
+    start_button = Button('black', WHITE, 0, btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
 
     #Random start
-    random_button = Button('brown', WINDOW_WIDTH//2, WINDOW_HEIGHT//2, WINDOW_WIDTH//3, 90, 'Random Start')
+    random_button = Button('brown', WHITE, 20, WINDOW_WIDTH//2, WINDOW_HEIGHT//2, WINDOW_WIDTH//3, 90, 'Random Start')
     
     #Glider
-    customize_button = Button('brown',WINDOW_WIDTH//8, WINDOW_HEIGHT//2, WINDOW_WIDTH//4, 90, 'Customize')
+    customize_button = Button('brown', WHITE, 20,WINDOW_WIDTH//8, WINDOW_HEIGHT//2, WINDOW_WIDTH//4, 90, 'Customize')
     
     import time
     pause = False

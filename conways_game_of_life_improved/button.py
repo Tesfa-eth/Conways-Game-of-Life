@@ -22,7 +22,7 @@ class Button():
         pygame.draw.rect(surface, self.button_color, (self.x, self.y, self.width, self.height), 0, self.rect_corner)
         
         if self.text != ' ':
-            letter_font = pygame.font.SysFont('Corbel', 33) #fonts for the button
+            letter_font = pygame.font.SysFont('Nevis', 25) #fonts for the button
             text = letter_font.render(self.text, True, self.text_color)
             surface.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
     

@@ -1,12 +1,7 @@
 """
 Play the game according to the rules
-Draw a window using pygame
+Display it in an interactive window using pygame
 
-Two issues that should be corrected:
- - what happens when the cell hits the wall. Currently,
-  it stops
- - This has slightly disrupted the size of the window creating some
- black edge.
 """
 
 from os import name
@@ -31,31 +26,14 @@ col = WHITE
 
 # finding window dimension
 
-"""
-import pyautogui
-
-width, height= pyautogui.size()
-print(width)
-print(height)
-"""
 def get_neighbours(array, i, j):
     """returns all the 8 neighbours of a cell"""
-    # to-do:
-    # take care of the frames rather than padding section
     row, column = array.shape[0], array.shape[1]
     if i >= row-2 or j >= column-2:
         return (0,0,0,0,0,0,0,0)
     else:
         return (array[i-1, j-1], array[i-1, j], array[i-1,j+1], array[i, j-1], array[i, j+1], 
             array[i+1, j-1], array[i+1, j], array[i+1, j+1])
-
-"""def is_padding(cell, padding):
-    
-    checks if a cell is a padding. Meaning, checks if the 'cell' is an actuall cell 
-    or a wall.
-    return: bool
-    
-    return cell == padding"""
 
 
 def remove_edges(neighbours):
@@ -92,24 +70,20 @@ def check_rule(array,i, j):
 
 def update_grid(array, block_size_y,block_size_x, start_update):
     """updates the grid and returns the new state"""
-    # for now
-    #newState = array
     btn_space = WINDOW_HEIGHT//20
     newState = np.zeros((array.shape[0], array.shape[1]))
 
     row, column = array.shape[0], array.shape[1]
     for i, j in np.ndindex(row, column):
-        #if start_update:
         if start_update:
-            #print("UPDATING")
+            #print("UPDATING") # debugging
             newState[i,j] = check_rule(array, i, j)
             col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
         else:
-            #print("No UPDATE")
+            #print("No UPDATE") # debugging
             newState = array
-            #print(newState)
             col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
@@ -122,20 +96,11 @@ def customize(mouse_position, grid):
     i = mouse_position[0]//block_size_height
     j = mouse_position[1]//block_size_weight
 
-    print(i,j)
-    print('shape', grid.shape)
+    #print('shape', grid.shape) # debugging
     
     if i < grid.shape[0] and j < grid.shape[0]:
         grid[j][i] = 1
-    """if grid[j][i] == 1: # depending on what they want regarding mouse customization
-        grid[j][i] = 0
-    else:
-        grid[j][i] = 1"""
-    #print(grid)
     return grid
-    #print(i,j)
-    #print(mouse_position[0]//block_size, mouse_position[1]//block_size)
-
 
 def start_game():
     """starts the game"""
@@ -208,8 +173,9 @@ def start_game():
     custom = False
     zoom_out = False
     zoom_in = False
+    quited = False
     maximize = 0
-    ######take user input################
+
     # basic font for user typed
     base_font = pygame.font.Font(None, 32)
     user_text = ''
@@ -223,10 +189,10 @@ def start_game():
     color_passive = (196, 196, 196)
     color = color_passive
     active = False
-    #####################
-    start_x = 45 # default grid size
+
+    start_x = 45 # default starting grid size
     start_y = 45
-    while True:
+    while not quited:
         if custom: # clicked user input
             grid = customize(mouse_position, grid)
             
@@ -237,15 +203,10 @@ def start_game():
                         
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # give option of drag or click for customization
-                    """if custom: # clicked user input
-                        grid = customize(mouse_position, grid)"""
-
-                    ########user input##################
                     if input_rect.collidepoint(event.pos):
                         active = True
                     else:
                         active = False
-                    ############################
 
                     if resume_button.mouse_over(mouse_position):
                         pause = False
@@ -255,18 +216,13 @@ def start_game():
                         main()
 
                     if start_button.mouse_over(mouse_position):
-                        #start update
                         update = True
                         custom = False
-                        #main()
                     if random_button.mouse_over(mouse_position):
                         try:
                             start_x = start_y = int(user_text) # take the starting gride size
                         except ValueError:
                             start_x = start_y = 40
-                            
-                        #start_x = 45
-                        #start_y = 45 # to be safely removed later
                         grid = random_array(start_x, start_y)
                         start = True
                     if customize_button.mouse_over(mouse_position):
@@ -274,10 +230,6 @@ def start_game():
                             start_x = start_y = int(user_text) # take the starting gride size
                         except ValueError:
                             start_x = start_y = 40
-                        
-                        # once done remove all the occurance of start_x and start_y except this one
-                        #start_x = 45
-                        #start_y = 45
                         grid = starting_array((start_x,start_y))
                         custom = True
                         start = True
@@ -285,16 +237,12 @@ def start_game():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if quit_button.mouse_over(mouse_position):
                         pygame.quit()
-
-                ###################################################
                 
                 if event.type == pygame.KEYDOWN:
                     pressed = pygame.key.get_pressed()
-                    if pressed[pygame.K_o]: # azoom out
+                    if pressed[pygame.K_o]: # zoom out
                         zoom_out = True
-                    if pressed[pygame.K_s]: # azoom out
-                        zoom_out = False
-                    if pressed[pygame.K_i]: # drag (open option!)
+                    if pressed[pygame.K_i]: # zoom in
                         zoom_in = True
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
@@ -305,13 +253,10 @@ def start_game():
 
                    
         # get mouse position              
-        mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
-    
+        mouse_position = pygame.mouse.get_pos()
         if start:
             SCREEN.fill(BLACK)
-            # maximize the grid in every 15 iteration
             if zoom_out and update:
-                #if maximize % 10 == 0:
                 grid = pad_array(grid, 0)
                 print("maximizing now")
                 maximize += 1
@@ -321,8 +266,7 @@ def start_game():
                 y = grid.shape[1]
                 grid = grid[1:x-1, 1:y-1]
                 zoom_in = False
-            grid = update_grid(grid, WINDOW_WIDTH/grid.shape[1], WINDOW_HEIGHT/grid.shape[0], update) # has to be both height and width
-            # draw buttons
+            grid = update_grid(grid, WINDOW_WIDTH/grid.shape[1], WINDOW_HEIGHT/grid.shape[0], update)
             resume_button.draw_rect(SCREEN)
             pause_button.draw_rect(SCREEN)
             restart_button.draw_rect(SCREEN)
@@ -334,20 +278,16 @@ def start_game():
             #menu
             menu.update(events) 
             menu.draw(SCREEN)
-            
             #subtitle
             myfont2 = pygame.font.SysFont('Nevis', 28)
             subtitle = myfont2.render('By Tesfa, Swagata, and Niki', False, WHITE)
             SCREEN.blit(subtitle,(165,220))
-            
             #message for user input
             myfont3 = pygame.font.SysFont('Nevis', 25)
             type_msg = myfont3.render('Type Number:', False, WHITE)
             SCREEN.blit(type_msg,(WINDOW_WIDTH//3-20, WINDOW_HEIGHT//3+77))
-    
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
-
             # text input
             if active:
                 color = color_active
@@ -365,14 +305,8 @@ def start_game():
         if pause == False:
             pygame.display.update()
 
-
-def main(begin=random_array(20, 20)):
-    #array_start = starting_array((8,8))
-    #array_start = begin
-    #add_Blinker(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
-    #add_Glider(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
-    #add_beacon(array_start.shape[0]//2 -2,array_start.shape[0]//2 -2, array_start)
-
+def main():
+    """main function"""
     start_game()
 
 

@@ -14,6 +14,7 @@ from time import sleep
 from numpy.core.defchararray import array
 import pygame
 import numpy as np
+from misc import draw_graph
 
 from create_grids import starting_array, add_Glider, add_Blinker, add_beacon, random_array
 
@@ -115,7 +116,8 @@ def start_game(grid):
     import time
     pause = False
     start = True
-    while True:
+    crashed = False
+    while not crashed:
         # working on starting page
         """if start:
             SCREEN.fill((200,200,200))
@@ -126,7 +128,8 @@ def start_game(grid):
             
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    #pygame.quit()
+                    crashed = True
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     #print(stop_button.mouse_over(mouse_position)) # returns false all the time
@@ -146,7 +149,8 @@ def start_game(grid):
                 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if quit_button.mouse_over(mouse_position):
-                        pygame.quit()
+                        #pygame.quit()
+                        crashed = True
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
         #time.sleep(0.5)
         grid = update_grid(grid, WINDOW_HEIGHT//grid.shape[0]) # has to be both height and width
@@ -170,3 +174,4 @@ def main(begin=random_array(40,40)):
 
 if __name__ == "__main__":
     main()
+    draw_graph()

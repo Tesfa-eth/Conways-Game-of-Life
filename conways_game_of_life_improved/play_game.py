@@ -1,10 +1,36 @@
-'''
-Adding buttons and other stuff. Updating on  opt_3.py
+"""
+Conway's Game of Life Simulation
+-----------------------------------
+Language: Python
+GUI Package: Pygame
+GUI Menu Package: Pygame_menu
+------------------------------------
+Type of game: zero-player
+Rules:
+1) Any live cell with two or three live neighbours survives.
+2) Any dead cell with three live neighbours becomes a live cell.
+3) All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+------------------------------------
+How to play:
+* Type Number: user can type an integer, which creates a grid based on the given number.
+* Customize button: selects the starting position of the alive cells.
+* Random Start button: selects a random position of the alive cells.
+* Start button: starts the game.
+* Pause button: pauses the game at the point it was stopped.
+* Resume button: resumes the game from the point it was paused earlier. 
+* Restart button: brings the user back to the menu page and restarts the game.
+* Quit button: stops the game completely and closes the GUI window.
+Note: used dictionary for the optimization. 
 
-Adding shading for 'once alive' cells
+Keys of the dictionary:
+1) The dictionary will have the index of the cells as the keys and the value 
+will be a list of two elements.
+2) The first element will indicate whether the cell is dead or alive, and 
+the second wil lhave the number of neighbors that are alive
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
+"""
 
-
-'''
 from os import name
 from numpy.core.defchararray import array
 import pygame
@@ -25,11 +51,8 @@ WINDOW_WIDTH = 600
 RED = (255, 0, 0)
 col = WHITE
 
-#n2 = 60 
-#n1 = 30
-
-
 def create_array(x, y):
+    """returns an array"""
     global n1 
     global n2 
     n1 = x
@@ -39,9 +62,10 @@ def create_array(x, y):
 
 def add_to_array(array, type_, x, y, size = 0):
     """array: to the array that stuff would be added
-    type: add_random, add_Glider, add_beacon, add_Blinker
-    x, y : position where the stuff is to be added
-    size: only required for add_random, in which case its the size of the array. Assumed to be square """
+       type: add_random, add_Glider, add_beacon, add_Blinker
+       x, y : coordinates for different positions to be added on the grid
+       size: only required for add_random, in which case its the size of the array.              Assumed to be square 
+     """
     if type_ == add_random:
         add_random(size, array, x, y)
     elif type_ == add_Glider:
@@ -51,14 +75,9 @@ def add_to_array(array, type_, x, y, size = 0):
     elif type_ == add_Blinker:
         add_Blinker(x, y, array)
     
-
-
 def array_(array, index_):
     """gives the value of the cell meaning 0 or 1. Takes in a tumple of (row, column)"""
     return array[index_[0], index_[1]]
-
-
-
 
 def neighbours_(array, index_):
     """calculates the number of living neighbors"""
@@ -69,21 +88,11 @@ def neighbours_(array, index_):
     num = [0 if i == 5 else i for i in num]
     return int(sum(num))
 
-
-#####
-## **Rules of the game**
-## If a living cell has 2 or 3 living neighbors, it stays alive
-## If a dead cell has exactly 3 living neighbor, it comes alive
-#####
-
-# keys of the dictionary
-
-# the dictionary will have the index of the cells as the keys and the value will be a list of two elements
-# the first element will indicate whether the cell is dead or alive, and the second wil lhave the number of neighbors that are alive
-
 def create_dic(array, shape):
-    """shape is the dimension of the array, takes in an integer. Assumption of square array
-    Creates a dictionary which has information of the starting array"""
+    """Creates a dictionary which has information of the starting array.
+       Parameter: Shape is the dimension of the array, takes in an integer. 
+       Assumption of the array.
+    """
     keys = []
     for i in range(shape[0]):
         for j in range(shape[1]):
@@ -98,12 +107,11 @@ def create_dic(array, shape):
 
     return dic
 
-
-### the rules of the game
-
+########### the rules of the game #############
 def check_next_state(index, dic_):
-    """takes in index of the cell and returns boolean on whether the cell state needs to change or not
-    by checking the number of neighbors from the value in the dictionary"""
+    """takes in index of the cell and returns boolean on whether 
+       the cell state needs to change or not by checking the number
+       of neighbors from the value in the dictionary"""
     # checking on dead cells
     if dic_[index][0] == 0:
         if dic_[index][1] == 3:
@@ -120,7 +128,6 @@ def check_next_state(index, dic_):
             return False
         else: 
             return True
-
 
 def update_dic_state(dic_, array):
     """
@@ -146,11 +153,12 @@ def update_dic_state(dic_, array):
     new_dic = update_dic_neighbor(new_dic, target_cells, updated_array)
     return new_dic,  updated_array
 
-
 def get_target_cells(change_list):
     """takes in the change_ list created by update_dic_state and 
-    returns a set containing all the cells that needs to be checked for next generation.
-    That is, it appends the neighbors of the cells that would change whose neighbors will be calculated for the next generation"""
+       returns a set containing all the cells that needs to be checked 
+       for next generation. That is, it appends the neighbors of the 
+       cells that would change whose neighbors will be calculated for 
+       the next generation"""
     target_cells = []
     for cell in change_list:
         for i in [-1, 0, 1]:
@@ -160,17 +168,15 @@ def get_target_cells(change_list):
 
     return set(target_cells)
 
-
 def update_dic_neighbor(dic_, target_cells_, array):
-    """takes in the result from the function update_dic_state and updated_array and 
-    return updated dictionary for next generation"""
+    """takes in the result from the function update_dic_state and 
+    updated_array and returns updated dictionary for next generation"""
     new_dic = dic_.copy()
 
     for i in target_cells_:
         new_dic[i] = [dic_[i][0], neighbours_(array, i)]
 
     return new_dic
-
 
 def update_array(array, change_):
     """will update the array by changing the indices from the change_ list"""
@@ -181,15 +187,12 @@ def update_array(array, change_):
 
     return newState
 
-
 def change_state(array, index):
     """changes state of the cell in the array"""
     if array_(array, index) == 0 or array_(array, index) == 5:
         array[index[0]][index[1]] = 1
     else:
         array[index[0]][index[1]] = 5
-
-
 
 def start_game(grid, dic):
     """starts the game"""
@@ -224,7 +227,7 @@ def start_game(grid, dic):
     restart_button = Button((255, 117, 117),WHITE, 0, 
                             btn_location_w-(btn_width*1), btn_location_h, 
                             btn_width, btn_height, 'Restart')
-    #Quit
+    #Quit Button
     quit_button = Button((255, 87, 87),WHITE, 0, btn_location_w-(btn_width*0),
                          btn_location_h, btn_width, btn_height, 'Quit')
     #Start Button
@@ -247,17 +250,17 @@ def start_game(grid, dic):
                             mouse_visible = True, 
                             theme = menu_theme)
     
-    #Grid choice
+    #Slider Bar to choose the grid measurments 
     choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
     choice = menu.add.selector(title='Choose grid:', items=choices,
                                style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
 
-    #Random start
+    #Random start Button
     random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
                            WINDOW_HEIGHT//2+140, WINDOW_WIDTH//3+90, 35, 
                            'Random Start')
     
-    #Glider
+    #Glider Button
     customize_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//8+80, 
                               WINDOW_HEIGHT//2+80, WINDOW_WIDTH//4+140, 35, 
                               'Customize')
@@ -279,13 +282,9 @@ def start_game(grid, dic):
                 pygame.quit()
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                #print(stop_button.mouse_over(mouse_position)) # returns false all the time
-                #print(mouse_position)
-                #if button is clicked then the game stops
                 if resume_button.mouse_over(mouse_position):
                     pause = False
-
-                #if button is clicked then the game stops
+                    
                 if pause_button.mouse_over(mouse_position):
                     pause = True
                 
@@ -334,7 +333,6 @@ def start_game(grid, dic):
             list_ = [BLACK, BLUE, RED, GREEN]
             for i, j in np.ndindex(n1, n2):
                 #col = random.choice(list_)
-
                 no1 = random.randint(0,255)
                 no2 = random.randint(0,255)
                 no3 = random.randint(0,255)

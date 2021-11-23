@@ -1,7 +1,14 @@
 """
+Conway's Game of Life Simulation
+-----------------------------------
 create_grids.py
+-----------------------------------
 This utility file: creates grids, offers different 
-sample starting points, padding
+sample starting points, padding.
+Functions: starting_array(shape=window_size), pad_array(array, _with=padding), add_Glider(i, j, array), add_Blinker(i, j, array), add_beacon(i, j, array), random_array(x, y). 
+Note: Used in game.py
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
 """
 
 import numpy as np
@@ -37,6 +44,7 @@ def add_Blinker(i, j, array):
 
 
 def add_beacon(i, j, array):
+    """beacon starting position"""
     beacon = np.array([[1, 1, 0, 0],
                        [1, 1, 0, 0],
                        [0, 0, 1, 1],

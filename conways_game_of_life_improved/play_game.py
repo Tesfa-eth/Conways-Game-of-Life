@@ -241,7 +241,7 @@ def start_game(grid, dic):
     #create theme
     menu_theme = pygame_menu.Theme(background_color = BLACK,
                      title_background_color=BLACK, title_font_color= WHITE,
-                     title_offset=(160,130), title_font_size = 48,
+                     title_offset=(160,120), title_font_size = 48,
                      widget_padding= 5, widget_font=menu_fonts, 
                      widget_font_size = 20, widget_background_color = BLACK,
                      widget_border_color = BLACK, widget_border_width =0,
@@ -367,7 +367,9 @@ def start_game(grid, dic):
             #subtitle
             myfont2 = pygame.font.SysFont('Nevis', 28)
             subtitle = myfont2.render('By Tesfa, Swagata, and Niki', False, WHITE)
-            SCREEN.blit(subtitle,(165,220))
+            SCREEN.blit(subtitle,(165,205))
+            version = myfont2.render('Version 2', False, WHITE)
+            SCREEN.blit(version,(245,235))
             
             #message for user input
             myfont3 = pygame.font.SysFont('Nevis', 25)
@@ -381,7 +383,6 @@ def start_game(grid, dic):
         
         if pause == False:
             pygame.display.update()
-        pygame.display.update()
 
 def main():
     arr = create_array(50, 50)

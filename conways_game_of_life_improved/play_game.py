@@ -22,6 +22,7 @@ How to play:
 * Resume button: resumes the game from the point it was paused earlier. 
 * Restart button: brings the user back to the menu page and restarts the game.
 * Quit button: stops the game completely and closes the GUI window.
+
 Note: used dictionary for the optimization. 
 
 Keys of the dictionary:
@@ -275,9 +276,11 @@ def start_game(grid, dic):
     start = False #changed from True to False
     update = False
     custom = False
+    
     start_x = 45 # default starting grid size
     start_y = 45
-    while True:
+    
+    while True:     
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:

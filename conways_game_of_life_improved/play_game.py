@@ -23,14 +23,14 @@ How to play:
 * Restart button: brings the user back to the menu page and restarts the game.
 * Quit button: stops the game completely and closes the GUI window.
 Note: used dictionary for the optimization. 
-
+* Statistics button: shows a graph of the number of alive cells over 
 Keys of the dictionary:
 1) The dictionary will have the index of the cells as the keys and the value 
 will be a list of two elements.
 2) The first element will indicate whether the cell is dead or alive, and 
 the second wil lhave the number of neighbors that are alive
 ------------------------------------
-Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
+Bennington College - Tesfa, Swagata, Niki - Coding Workshop 2021
 """
 
 from os import name
@@ -41,8 +41,9 @@ import numpy as np
 import random 
 
 from create_grids import add_random, random_array, add_Glider,  starting_array, add_beacon, add_Blinker
-
+from graph_drawing import *
 from button import Button 
+
 
 BLUE = (34, 36, 128)
 WHITE = (255,255,255)
@@ -52,7 +53,9 @@ WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
 RED = (255, 0, 0)
 col = WHITE
-
+grid_size = [10]
+start_x = 40
+start_y = 40
 def create_array(x, y):
     """returns an array"""
     global n1 
@@ -131,29 +134,33 @@ def check_next_state(index, dic_):
         else: 
             return True
 
-def update_dic_state(dic_, array):
+def update_dic_state(dic_, array, update_state):
     """
     NEED TO CHANGE THIS:
     takes in dictionary containing state of current state,
     returns a tuple: (dictionary with updated state, set of cells that need to be updated for their neighbors)"""
     new_dic = dic_.copy()
 
-    change_ = []      # list of indices which changes; dead -> alive, alive -> dead
-    for k in dic_:
-        if check_next_state(k, dic_):
-            change_.append(k)
-            if dic_[k][0] == 0:
-                new_dic[k] = [1, dic_[k][1]]
-            elif dic_[k][0] == 5:
-                new_dic[k] = [1, dic_[k][1]]
-            else:
-                new_dic[k] = [5, dic_[k][1]]
-    updated_array = update_array(array, change_)
-    target_cells = get_target_cells(change_)
-    #print(new_dic)
-    #print("-----------------------------------")
-    new_dic = update_dic_neighbor(new_dic, target_cells, updated_array)
-    return new_dic,  updated_array
+    if update_state:
+        change_ = []      # list of indices which changes; dead -> alive, alive -> dead
+        for k in dic_:
+            if check_next_state(k, dic_):
+                change_.append(k)
+                if dic_[k][0] == 0:
+                    new_dic[k] = [1, dic_[k][1]]
+                elif dic_[k][0] == 5:
+                    new_dic[k] = [1, dic_[k][1]]
+                else:
+                    new_dic[k] = [5, dic_[k][1]]
+        updated_array = update_array(array, change_)
+        target_cells = get_target_cells(change_)
+        #print(new_dic)
+        #print("-----------------------------------")
+        new_dic = update_dic_neighbor(new_dic, target_cells, updated_array)
+        
+        return new_dic,  updated_array
+    else:
+        return new_dic, array
 
 def get_target_cells(change_list):
     """takes in the change_ list created by update_dic_state and 
@@ -196,11 +203,34 @@ def change_state(array, index):
     else:
         array[index[0]][index[1]] = 5
 
-def start_game(grid, dic):
+##############################
+# customizing grid
+def customize(mouse_position, grid):
+    """returns a new customized grid of alive cells"""
+    block_size_height = WINDOW_HEIGHT//grid.shape[0]
+    block_size_weight = WINDOW_WIDTH//grid.shape[1]
+    i = mouse_position[0]//block_size_height
+    j = mouse_position[1]//block_size_weight
+    
+    if i < grid.shape[0] and j < grid.shape[0]:
+        grid[j][i] = 1
+    return grid
+
+def set_difficulty(value, difficulty):
+    """select difficulty based on the value of the selector input"""
+    difficulty_level = {0:10, 1:20, 2:50, 3:120}
+    grid_size.append(difficulty_level[value[1]])
+
+###################################
+
+def start_game():
     """starts the game"""
     global SCREEN, CLOCK
-    
-    no_of_btns = 5
+    global start_x, start_y
+    alive_list = []
+    array_list = []
+
+    no_of_btns = 6
     btn_height = WINDOW_HEIGHT//20 # leave a space to draw buttons
     btn_location_h = WINDOW_HEIGHT - btn_height # btn location from buttom screen
     btn_width = WINDOW_WIDTH//no_of_btns # button width for each button
@@ -235,6 +265,9 @@ def start_game(grid, dic):
     #Start Button
     start_button = Button((255, 87, 87), WHITE, 0, btn_location_w-(btn_width*4),
                           btn_location_h, btn_width, btn_height, 'Start')
+    #Stat Button
+    stat_button = Button((255, 87, 87), WHITE, 0, btn_location_w-(btn_width*5),
+                          btn_location_h, btn_width, btn_height, 'Statistics')
     
     ######################## MENU ########################
     menu_fonts = pygame_menu.font.FONT_NEVIS
@@ -253,9 +286,10 @@ def start_game(grid, dic):
                             theme = menu_theme)
     
     #Slider Bar to choose the grid measurments 
-    choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
+    choices = [('10 x 10', WHITE), ('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
     choice = menu.add.selector(title='Choose grid:', items=choices,
-                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
+                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY,
+                               onchange=set_difficulty)
 
     #Random start Button
     random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
@@ -269,28 +303,42 @@ def start_game(grid, dic):
     ###############################################
     
     import time
-    dic_ = dic
-    grid_ = grid
     pause = False
     start = False #changed from True to False
     update = False
     custom = False
-    start_x = 45 # default starting grid size
-    start_y = 45
-    while True:
+    
+    # color_active stores color(red) which
+    # gets active when input box is clicked by user
+    color_active = pygame.Color(194, 60, 60)
+    color_passive = (196, 196, 196)
+    color = color_passive
+    active = False
+    
+
+    # basic font for user typed
+    base_font = pygame.font.Font(None, 32)
+    user_text = ''
+    # create rectangle for the user input
+    input_rect = pygame.Rect(WINDOW_WIDTH//3+100, WINDOW_HEIGHT//3+70, 5, 32)
+    game = False
+    while not game:
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                pygame.quit()
+                game = True
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if resume_button.mouse_over(mouse_position):
                     pause = False
+                    update = True
                     
                 if pause_button.mouse_over(mouse_position):
                     pause = True
+                    update = False
                 
                 if restart_button.mouse_over(mouse_position):
+                    grid_size.append(10)
                     main()
 
                 if start_button.mouse_over(mouse_position):
@@ -299,54 +347,89 @@ def start_game(grid, dic):
                     custom = False
                     
                 if random_button.mouse_over(mouse_position):
-                    grid = random_array(start_x, start_y)
-                    start = True
-                    
-                if customize_button.mouse_over(mouse_position):
-                    grid = starting_array((start_x,start_y))
-                    custom = True
+                    try:
+                        start_x = start_y = int(user_text) # take the starting gride size
+                    except ValueError:
+                        if grid_size:
+                            start_x = start_y = grid_size[-1]
+                        else:
+                            start_x = start_y = 40                
+                    grid_ = create_array(start_x, start_y)
+                    add_to_array(grid_, add_random, 0, 0, start_x//2)
+                    dic_ = create_dic(grid_, (start_x, start_y))
                     start = True
                 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+                if customize_button.mouse_over(mouse_position):
+                    try:
+                        start_x = start_y = int(user_text) # take the starting gride size
+                    except ValueError:
+                        if grid_size:
+                            start_x = start_y = grid_size[-1]
+                        else:
+                            start_x = start_y = 40
+                    grid_ = create_array(start_x, start_y)
+                    custom = True
+                    start = True
+                if custom: # clicked user input for mouse click only
+                    grid_ = customize(mouse_position, grid_)
+                    dic_ = create_dic(grid_, (start_x, start_y))    
+                       
+
                 if quit_button.mouse_over(mouse_position):
-                    pygame.quit()       
+                    game = True
+
+                # statistics
+                if stat_button.mouse_over(mouse_position):
+                    game = True
+                    draw_graph(alive_list)
+
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    # when back space is hit
+                    user_text = user_text[:-1]
+                else: # additional string
+                    user_text += event.unicode
+
                     
         mouse_position = pygame.mouse.get_pos() # tuple of x, y coordinates 
+
         
         if start:
+
             SCREEN.fill(BLACK)
             #####################
-            stuff = update_dic_state(dic_, grid_)
+            if update:
+                array_list.append(grid_)
+
+            stuff = update_dic_state(dic_, grid_, update)
             alive = sum([1 for i in dic_ if dic_[i][0] == 1])
             alive_button = Button((245, 186, 184),BLACK, 20, 10, 10, 200, 50, 
                                   f'Alive:{alive}')
+            if update:
+                alive_list.append(alive)
+                
             dic_ = stuff[0]
             grid_ = stuff[1]
             ####################
         
-            #time.sleep(0.05)
+            #time.sleep(0.1)
 
             ###################
-            gen += 1
+            if update:
+                gen+=1
             gen_button = Button((196, 73, 69),BLACK, 20, 390, 10, 200, 50,
                                 f'Generation:{gen}')
             block_size_r = WINDOW_HEIGHT//n1
             block_size_c = WINDOW_WIDTH//n2
             list_ = [BLACK, BLUE, RED, GREEN]
             for i, j in np.ndindex(n1, n2):
-                #col = random.choice(list_)
-                no1 = random.randint(0,255)
-                no2 = random.randint(0,255)
-                no3 = random.randint(0,255)
-                col = (no1, no2, no3)
                 if grid_[i,j] == 1:
                     col = BLUE
                 if grid_[i,j] == 5:
-                    col = (240,210,210)
+                    col = (240,210,210,0.1)
                 if grid_[i,j] == 0:
                     col = (50, 50, 50)
-                #print(col)
-                #col = col if grid_[i, j] == 1 else (50,50,50)
                 rect = pygame.Rect(j*block_size_c, i*block_size_r, block_size_c-1, block_size_r-1)
                 pygame.draw.rect(SCREEN, col, rect)
         
@@ -358,7 +441,10 @@ def start_game(grid, dic):
             quit_button.draw_rect(SCREEN)
             gen_button.draw_rect(SCREEN)
             alive_button.draw_rect(SCREEN)
-            
+            stat_button.draw_rect(SCREEN)
+        
+   
+
         else:
             #menu
             menu.update(events) 
@@ -366,8 +452,11 @@ def start_game(grid, dic):
             
             #subtitle
             myfont2 = pygame.font.SysFont('Nevis', 28)
+            myfont3 = pygame.font.SysFont('Nevis', 22)
             subtitle = myfont2.render('By Tesfa, Swagata, and Niki', False, WHITE)
             SCREEN.blit(subtitle,(165,220))
+            version = myfont3.render('Version 2', False, WHITE)
+            SCREEN.blit(version,(265,250))
             
             #message for user input
             myfont3 = pygame.font.SysFont('Nevis', 25)
@@ -376,19 +465,24 @@ def start_game(grid, dic):
     
             random_button.draw_rect(SCREEN)
             customize_button.draw_rect(SCREEN)
-
+            # text input
+            if active:
+                color = color_active
+            else:
+                color = color_passive
+            
+            pygame.draw.rect(SCREEN, color, input_rect, border_radius=20)
+            text_surface = base_font.render(user_text, True, WHITE)
+            SCREEN.blit(text_surface, (input_rect.x+5, input_rect.y+5))
+            input_rect.w = max(100, text_surface.get_width()+10)
             pygame.display.flip()
         
         if pause == False:
             pygame.display.update()
-        pygame.display.update()
+        
 
 def main():
-    arr = create_array(50, 50)
-    add_to_array(arr, add_random, 15, 15, 20)
-    add_to_array(arr, add_Glider, 0, 0)
-    print(n1, n2)
-    start_game(arr, create_dic(arr,(n1, n2)))
+    start_game()
 
 if __name__ == "__main__":
     main()

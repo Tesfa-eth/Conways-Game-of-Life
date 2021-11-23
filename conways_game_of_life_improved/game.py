@@ -166,7 +166,6 @@ def start_game():
                               WINDOW_HEIGHT//2+80, WINDOW_WIDTH//4+140, 35, 
                               'Customize')
     
-    import time
     pause = False
     start = False
     update = False
@@ -174,6 +173,7 @@ def start_game():
     zoom_out = False
     zoom_in = False
     quited = False
+    drag = False
     maximize = 0
 
     # basic font for user typed
@@ -193,7 +193,7 @@ def start_game():
     start_x = 45 # default starting grid size
     start_y = 45
     while not quited:
-        if custom: # clicked user input
+        if custom and drag: # clicked user input for mouse drag
             grid = customize(mouse_position, grid)
             
         events = pygame.event.get()
@@ -233,8 +233,9 @@ def start_game():
                         grid = starting_array((start_x,start_y))
                         custom = True
                         start = True
-                    
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if custom: # clicked user input for mouse click only
+                        grid = customize(mouse_position, grid)
+                        
                     if quit_button.mouse_over(mouse_position):
                         pygame.quit()
                 
@@ -244,12 +245,17 @@ def start_game():
                         zoom_out = True
                     if pressed[pygame.K_i]: # zoom in
                         zoom_in = True
+                    if pressed[pygame.K_d]: # enable custom dragging
+                        drag = True
+                    if pressed[pygame.K_s]: # stop custom dragging
+                        drag = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         # when back space is hit
                         user_text = user_text[:-1]
                     else: # additional string
                         user_text += event.unicode
+
 
                    
         # get mouse position              
@@ -258,7 +264,7 @@ def start_game():
             SCREEN.fill(BLACK)
             if zoom_out and update:
                 grid = pad_array(grid, 0)
-                print("maximizing now")
+                # print("maximizing now")
                 maximize += 1
                 zoom_out = False
             elif zoom_in and update:
@@ -300,8 +306,6 @@ def start_game():
             input_rect.w = max(100, text_surface.get_width()+10)
             pygame.display.flip()
 
-        #print(grid)
-        # update the grid unless it is paused
         if pause == False:
             pygame.display.update()
 

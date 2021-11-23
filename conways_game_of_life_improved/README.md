@@ -1,6 +1,15 @@
-## This is what the graphics looks like:
-## These were done using beacon and blinker starting points
+# Conway's Game of Life Simulation
 
+This collaboarative project is written between Tesfa, Swag, and Niki. It's a simulation of Conways's game of life, which is a game in a two-dimensional orthogonal grid of square cells. There are two possible states of the cells, live or dead. Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. This game is a zero-player game.
 
-![Screenshot (274)](https://user-images.githubusercontent.com/62855279/140463593-f492e7be-c710-4241-a187-2111adfc2e5f.png)
-![Screenshot (275)](https://user-images.githubusercontent.com/62855279/140463594-60da12d8-d3ca-40ad-b6f3-5de0d96a1728.png)
+The rules the cells follow are the ones bellow:
+
+1) Any live cell with two or three live neighbours survives.
+2) Any dead cell with three live neighbours becomes a live cell.
+3) All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+
+Project status: finished
+
+To use it: Got to the file conways_game_of_life_improved write <python play_game.py>. Then run in your unix terminal .
+
+Technology used: Language: Python GUI Package: Pygame GUI Menu Package: Pygame_menu

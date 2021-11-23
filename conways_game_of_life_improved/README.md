@@ -1,4 +1,4 @@
-# Conway's Game of Life Simulation
+# Conway's Game of Life Simulation (Version-1)
 
 This collaboarative project is written between Tesfa, Swag, and Niki. 
 It's a simulation of Conways's game of life, which is a game in a two-dimensional orthogonal grid of square cells.

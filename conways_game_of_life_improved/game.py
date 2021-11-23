@@ -21,10 +21,7 @@ BLACK = (0,0,0)
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
 col = WHITE
-#padding = 6
-
-
-# finding window dimension
+grid_size = []
 
 def get_neighbours(array, i, j):
     """returns all the 8 neighbours of a cell"""
@@ -102,10 +99,14 @@ def customize(mouse_position, grid):
         grid[j][i] = 1
     return grid
 
+def set_difficulty(value, difficulty):
+    """select difficulty based on the value of the selector input"""
+    difficulty_level = {0:10, 1:20, 2:35, 3:50, 4:75, 5:100, 6:120}
+    grid_size.append(difficulty_level[value[1]])
+
 def start_game():
     """starts the game"""
     global SCREEN, CLOCK
-
     no_of_btns = 5
     btn_height = WINDOW_HEIGHT//20 # leave a space to draw buttons
     btn_location_h = WINDOW_HEIGHT - btn_height # btn location from buttom screen
@@ -151,11 +152,12 @@ def start_game():
                             mouse_visible = True, 
                             theme = menu_theme)
     
-    #Grid choice
-    choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
+    #Grid choice for selector
+    choices = [('10 x 10', WHITE),('20 x 20', WHITE), ('35 x 35', WHITE), ('50 x 50', WHITE),('75 x 75', WHITE), 
+    ('100 x 100', WHITE), ('120 x 120', WHITE)]
     choice = menu.add.selector(title='Choose grid:', items=choices,
-                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
-
+                               style=pygame_menu.widgets.SELECTOR_STYLE_FANCY, onchange=set_difficulty)
+        
     #Random start
     random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
                            WINDOW_HEIGHT//2+140, WINDOW_WIDTH//3+90, 35, 
@@ -172,14 +174,12 @@ def start_game():
     custom = False
     zoom_out = False
     zoom_in = False
-    quited = False
     drag = False
     maximize = 0
 
     # basic font for user typed
     base_font = pygame.font.Font(None, 32)
     user_text = ''
-    
     # create rectangle
     input_rect = pygame.Rect(WINDOW_WIDTH//3+100, WINDOW_HEIGHT//3+70, 5, 32)
     
@@ -189,10 +189,7 @@ def start_game():
     color_passive = (196, 196, 196)
     color = color_passive
     active = False
-
-    start_x = 45 # default starting grid size
-    start_y = 45
-    while not quited:
+    while True:
         if custom and drag: # clicked user input for mouse drag
             grid = customize(mouse_position, grid)
             
@@ -222,19 +219,28 @@ def start_game():
                         try:
                             start_x = start_y = int(user_text) # take the starting gride size
                         except ValueError:
-                            start_x = start_y = 40
+                            if grid_size:
+                                start_x = start_y = grid_size[-1]
+                            else:
+                                start_x = start_y = 40
+
                         grid = random_array(start_x, start_y)
                         start = True
+                    
+                    if custom: # clicked user input for mouse click only
+                        grid = customize(mouse_position, grid)
+
                     if customize_button.mouse_over(mouse_position):
                         try:
                             start_x = start_y = int(user_text) # take the starting gride size
                         except ValueError:
-                            start_x = start_y = 40
+                            if grid_size:
+                                start_x = start_y = grid_size[-1]
+                            else:
+                                start_x = start_y = 40
                         grid = starting_array((start_x,start_y))
                         custom = True
                         start = True
-                    if custom: # clicked user input for mouse click only
-                        grid = customize(mouse_position, grid)
                         
                     if quit_button.mouse_over(mouse_position):
                         pygame.quit()

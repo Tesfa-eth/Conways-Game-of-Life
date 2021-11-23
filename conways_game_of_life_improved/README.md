@@ -1,4 +1,4 @@
-# Conway's Game of Life Simulation
+# Conway's Game of Life Simulation (Version-2)
 
 This collaboarative project is written between Tesfa, Swag, and Niki. It's a simulation of Conways's game of life, which is a game in a two-dimensional orthogonal grid of square cells. There are two possible states of the cells, live or dead. Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. This game is a zero-player game.
 

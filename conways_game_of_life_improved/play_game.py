@@ -214,23 +214,17 @@ def start_game(grid, dic):
     pause_button = Button((255, 117, 117), WHITE, 0, 
                           btn_location_w-(btn_width*3), btn_location_h, 
                           btn_width, btn_height, 'Pause')
-    #pause_button = Button('blue', BLACK, 20, 305, 700, 85, 50, 'Pause') #create quit button
-     
     
     #Resume Button 
-    #resume_button = Button('magenta', BLACK,20, 400, 700, 110, 50, 'Resume')
     resume_button = Button((255, 173, 173),WHITE, 0, 
                            btn_location_w-(btn_width*2), btn_location_h, 
                            btn_width, btn_height, 'Resume')
     #Restart Button
     # color, x, y, width, height
-    #restart_button = Button('darkblue',BLACK,20, 180, 700, 110, 50, 'Restart')
     restart_button = Button((255, 117, 117),WHITE, 0, 
                             btn_location_w-(btn_width*1), btn_location_h, 
                             btn_width, btn_height, 'Restart')
-
     #Quit
-    #quit_button = Button('brown', BLACK, 20, 60, 700, 110, 50, 'Quit')
     quit_button = Button((255, 87, 87),WHITE, 0, btn_location_w-(btn_width*0),
                          btn_location_h, btn_width, btn_height, 'Quit')
     #Start Button
@@ -238,8 +232,8 @@ def start_game(grid, dic):
                           btn_location_h, btn_width, btn_height, 'Start')
     
     ######################## MENU ########################
-    #Menu
     menu_fonts = pygame_menu.font.FONT_NEVIS
+    #create theme
     menu_theme = pygame_menu.Theme(background_color = BLACK,
                      title_background_color=BLACK, title_font_color= WHITE,
                      title_offset=(160,130), title_font_size = 48,
@@ -269,20 +263,21 @@ def start_game(grid, dic):
                               'Customize')
     ###############################################
     
-
     import time
     dic_ = dic
     grid_ = grid
     pause = False
-    start = True
+    start = False #changed from True to False
     update = False
     custom = False
-    
+    start_x = 45 # default starting grid size
+    start_y = 45
     while True:
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
+                
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #print(stop_button.mouse_over(mouse_position)) # returns false all the time
                 #print(mouse_position)
@@ -301,6 +296,15 @@ def start_game(grid, dic):
                     #start update
                     update = True
                     custom = False
+                    
+                if random_button.mouse_over(mouse_position):
+                    grid = random_array(start_x, start_y)
+                    start = True
+                    
+                if customize_button.mouse_over(mouse_position):
+                    grid = starting_array((start_x,start_y))
+                    custom = True
+                    start = True
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if quit_button.mouse_over(mouse_position):

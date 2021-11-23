@@ -14,7 +14,7 @@ The rules the cells follow are the ones bellow:
 Project status: finished
 
 To use it:
-Got to the file conways_game_of_life_improved. Then run in your unix terminal <python game.py>.
+Go to the file conways_game_of_life_improved. Then run in your unix terminal <python game.py>.
 
 Technology used:
 Language: Python

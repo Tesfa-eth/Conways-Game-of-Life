@@ -1,9 +1,30 @@
 """
-Play the game according to the rules
-Display it in an interactive window using pygame
+Conway's Game of Life Simulation
+-----------------------------------
+Language: Python
+GUI Package: Pygame
+GUI Menu Package: Pygame_menu
+------------------------------------
+Type of game: zero-player
+Rules:
+1) Any live cell with two or three live neighbours survives.
+2) Any dead cell with three live neighbours becomes a live cell.
+3) All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+------------------------------------
+How to play:
+* Type Number: user can type an integer, which creates a grid based on the given number.
+* Customize button: selects the starting position of the alive cells.
+* Random Start button: selects a random position of the alive cells.
+* Start button: starts the game.
+* Pause button: pauses the game at the point it was stopped.
+* Resume button: resumes the game from the point it was paused earlier. 
+* Restart button: brings the user back to the menu page and restarts the game.
+* Quit button: stops the game completely and closes the GUI window.
 
+Note: used np arrays.
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
 """
-
 from os import name
 from time import sleep
 from numpy.core.defchararray import array
@@ -21,10 +42,6 @@ BLACK = (0,0,0)
 WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 600
 col = WHITE
-#padding = 6
-
-
-# finding window dimension
 
 def get_neighbours(array, i, j):
     """returns all the 8 neighbours of a cell"""
@@ -39,7 +56,6 @@ def get_neighbours(array, i, j):
 def remove_edges(neighbours):
     """takes in a tuple and removes the egdes from them"""
     neighbours_list = list(neighbours)
-    #egdeless_neighbours = [ 0 if is_padding(x, padding) else int(x) for x in neighbours_list]
     return tuple(neighbours_list)
 
 def is_alive(cell):
@@ -53,7 +69,6 @@ def check_rule(array,i, j):
     return: 0 (if it will die) or 1 (if it will live)
     """
     neighbours = get_neighbours(array, i, j)
-    #actual_neighbours = remove_edges(neighbours)
     neighbour_value = sum(list(neighbours))
 
     if is_alive(array[i,j]):
@@ -76,13 +91,11 @@ def update_grid(array, block_size_y,block_size_x, start_update):
     row, column = array.shape[0], array.shape[1]
     for i, j in np.ndindex(row, column):
         if start_update:
-            #print("UPDATING") # debugging
             newState[i,j] = check_rule(array, i, j)
             col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x-btn_space, block_size_y-1, block_size_x-1)
             pygame.draw.rect(SCREEN, col, rect)
         else:
-            #print("No UPDATE") # debugging
             newState = array
             col = BLACK if newState[i, j] == 1 else WHITE
             rect = pygame.Rect(j*block_size_y, i*block_size_x, block_size_y-1, block_size_x-1)
@@ -91,12 +104,11 @@ def update_grid(array, block_size_y,block_size_x, start_update):
     return newState
 
 def customize(mouse_position, grid):
+    """returns a new customized grid of alive cells"""
     block_size_height = WINDOW_HEIGHT//grid.shape[0]
     block_size_weight = WINDOW_WIDTH//grid.shape[1]
     i = mouse_position[0]//block_size_height
     j = mouse_position[1]//block_size_weight
-
-    #print('shape', grid.shape) # debugging
     
     if i < grid.shape[0] and j < grid.shape[0]:
         grid[j][i] = 1
@@ -119,25 +131,26 @@ def start_game():
     SCREEN.fill(BLACK)
     
     
-    #Termination Button 
+    #Pause Button 
     pause_button = Button((255, 117, 117), WHITE, 0, btn_location_w-(btn_width*3), btn_location_h, btn_width, btn_height, 'Pause') #create quit button
     #stop_button.draw_rect(SCREEN) 
     
-    #Pause Button 
+    #Resume Button 
     resume_button = Button((255, 173, 173),WHITE, 0, btn_location_w-(btn_width*2), btn_location_h, btn_width, btn_height, 'Resume')
     
     #Restart Button
-    # color, x, y, width, height
     restart_button = Button((255, 117, 117),WHITE, 0, btn_location_w-(btn_width*1), btn_location_h, btn_width, btn_height, 'Restart')
 
-    #Quit
+    #Quit Button
     quit_button = Button((255, 87, 87),WHITE, 0, btn_location_w-(btn_width*0), btn_location_h, btn_width, btn_height, 'Quit')
 
-    #Start    btn_location_w-(btn_width*4) gives us the exact location of the buttons
+    #Start Button   btn_location_w-(btn_width*4) gives us the exact location of the buttons
     start_button = Button((255, 87, 87), WHITE, 0, btn_location_w-(btn_width*4), btn_location_h, btn_width, btn_height, 'Start')
     
-    #Menu
+    ######################### Menu #####################
     menu_fonts = pygame_menu.font.FONT_NEVIS
+    
+    #stylistics choices of the menu 
     menu_theme = pygame_menu.Theme(background_color = BLACK,
                      title_background_color=BLACK, title_font_color= WHITE,
                      title_offset=(160,130), title_font_size = 48,
@@ -151,21 +164,21 @@ def start_game():
                             mouse_visible = True, 
                             theme = menu_theme)
     
-    #Grid choice
+    #Slidebar to choose grid mesurements (eg. 5x5)
     choices = [('20 x 20', WHITE), ('50 x 50', WHITE), ('100 x 100', WHITE)]
     choice = menu.add.selector(title='Choose grid:', items=choices,
                                style=pygame_menu.widgets.SELECTOR_STYLE_FANCY)
 
-    #Random start
+    #Random start button
     random_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//2-145, 
                            WINDOW_HEIGHT//2+140, WINDOW_WIDTH//3+90, 35, 
                            'Random Start')
     
-    #Glider
+    #Customize button
     customize_button = Button(WHITE, BLACK, 20,WINDOW_WIDTH//8+80, 
                               WINDOW_HEIGHT//2+80, WINDOW_WIDTH//4+140, 35, 
                               'Customize')
-    
+    #####################################################
     pause = False
     start = False
     update = False
@@ -180,7 +193,7 @@ def start_game():
     base_font = pygame.font.Font(None, 32)
     user_text = ''
     
-    # create rectangle
+    # create rectangle for the user input
     input_rect = pygame.Rect(WINDOW_WIDTH//3+100, WINDOW_HEIGHT//3+70, 5, 32)
     
     # color_active stores color(red) which
@@ -255,10 +268,8 @@ def start_game():
                         user_text = user_text[:-1]
                     else: # additional string
                         user_text += event.unicode
-
-
-                   
-        # get mouse position              
+ 
+        # get tuple of (x,y) coordinates for mouse position              
         mouse_position = pygame.mouse.get_pos()
         if start:
             SCREEN.fill(BLACK)

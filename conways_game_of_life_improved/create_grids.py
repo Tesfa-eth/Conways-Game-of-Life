@@ -1,8 +1,15 @@
 """
-This utility file: 
-    - creates grids
-    - offers different sample starting points
-    - padding
+Conway's Game of Life Simulation
+-----------------------------------
+create_grids.py
+-----------------------------------
+This utility file: creates grids, offers different 
+sample starting points, padding.
+Functions: starting_array(shape=window_size), pad_array(array, _with=padding), add_Glider(i, j, array), add_Blinker(i, j, array), add_beacon(i, j, array), random_array(x, y), add_random(n, array, x,y). 
+
+Note: Used in play_game.py
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
 """
 
 import numpy as np

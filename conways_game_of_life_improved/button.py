@@ -1,5 +1,13 @@
 '''
-This creates the buttons and places them on the bottom of the GUI
+Conway's Game of Life Simulation
+-----------------------------------
+button.py
+-----------------------------------
+Build in class that creates customized buttons. The functions it has are; draw_rect(), mouse_over(), and pause_game().
+
+Note: Used in play_game.py
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
 '''
 import pygame 
 

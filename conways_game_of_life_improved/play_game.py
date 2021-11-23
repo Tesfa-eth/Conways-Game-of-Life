@@ -1,6 +1,8 @@
 """
 Conway's Game of Life Simulation
 -----------------------------------
+play_game.py
+-----------------------------------
 Language: Python
 GUI Package: Pygame
 GUI Menu Package: Pygame_menu

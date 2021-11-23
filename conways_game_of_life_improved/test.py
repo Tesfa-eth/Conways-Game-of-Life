@@ -1,5 +1,9 @@
 """
+Conway's Game of Life Simulation
+-----------------------------------
 Testing the functions inside the creat_grids.py and game.py
+------------------------------------
+Bennington College - Tesfa, Swag, Niki - Coding Workshop 2021
 """
 
 import numpy as np

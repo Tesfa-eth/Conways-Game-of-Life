@@ -1,6 +1,6 @@
 # Conway-s-Game-of-Life
 
-This collaboarative project is written between Tesfa, Swag, and Niki for [Coding Workshop](https://cs.bennington.college/courses/fall2021/coding/home).
+## This collaboarative project is written between Tesfa, Swag, and Niki for [Coding Workshop](https://cs.bennington.college/courses/fall2021/coding/home).
 
 It's a simulation of Conways's game of life, which is a game in a two-dimensional orthogonal grid of square cells.
 There are two possible states of the cells, live or dead. Every cell interacts with its eight neighbours, which are 

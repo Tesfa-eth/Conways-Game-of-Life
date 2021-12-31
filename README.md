@@ -18,3 +18,5 @@ Technology used:
 Language: Python
 GUI Package: Pygame
 GUI Menu Package: Pygame_menu
+
+  ![1SB3SraMMK](https://user-images.githubusercontent.com/62855279/147797218-72411c5d-101a-42ee-8eb7-bdaf9f1b1d5e.gif)
